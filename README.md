@@ -1,23 +1,120 @@
-# React + TypeScript + Vite
+# Mebel Store - Furniture Landing Page
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive React + TypeScript landing page for a furniture store featuring a magazine-style product viewer with page-flipping animation.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Responsive Design**: Mobile-first layout with breakpoints for mobile (< 768px), tablet (768px - 1024px), and desktop (> 1024px)
+- **Hero Carousel**: Auto-sliding image carousel with manual navigation and pagination
+- **Categories Grid**: Interactive cards for Wardrobes, Sofas, and Kitchens
+- **Magazine Viewer**: Fullscreen modal with realistic page-flipping animation
+- **Page Flipping**: Desktop shows two pages per spread, mobile shows single pages
+- **Orientation Support**: Handles both portrait and landscape image orientations
+- **Lazy Loading**: Images load on demand for better performance
+- **Keyboard Navigation**: ESC to close modal, arrow keys for navigation
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- react-pageflip for page flipping animation
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
+- Node.js (v16 or higher)
+- npm
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Deploy to GitHub Pages
+
+```bash
+npm run deploy
+```
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── Header.tsx          # Navigation header
+│   ├── HeroCarousel.tsx    # Image carousel
+│   ├── CategoriesGrid.tsx  # Category selection cards
+│   ├── CategorySection.tsx # Product sections
+│   ├── MagazineCard.tsx    # Individual product cards
+│   ├── MagazineModal.tsx   # Fullscreen viewer modal
+│   ├── FlipBookViewer.tsx  # Page flipping component
+│   └── Footer.tsx          # Site footer
+├── hooks/
+│   ├── useGallery.ts       # Data fetching hook
+│   └── useMediaQuery.ts    # Responsive breakpoint hook
+├── types/
+│   ├── index.ts            # TypeScript interfaces
+│   └── react-pageflip.d.ts # react-pageflip type definitions
+├── App.tsx                 # Main application component
+└── main.tsx                # Application entry point
+
+public/
+├── gallery-manifest.json   # Product data
+└── images/                 # Product images
+```
+
+## Data Structure
+
+Product data is stored in `public/gallery-manifest.json` with the following structure:
+
+```json
+{
+  "wardrobes": [
+    {
+      "id": 1,
+      "name": "Modern Wardrobe",
+      "description": "A sleek and contemporary wardrobe",
+      "price": 799.99,
+      "orientation": "portrait",
+      "images": ["/path/to/image1.jpg", "/path/to/image2.jpg"]
+    }
+  ],
+  "sofas": [...],
+  "kitchens": [...]
+}
+```
+
+## Responsive Behavior
+
+- **Desktop**: Grid layouts, two-page flipbook spreads
+- **Mobile**: Stacked layouts, single-page flipbook
+- **Tablet**: Adaptive between desktop and mobile layouts
+
+## Contributing
+
+1. Follow the existing code style and TypeScript types
+2. Use functional components with hooks
+3. Ensure responsive design works across all breakpoints
+4. Test on multiple devices and browsers
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

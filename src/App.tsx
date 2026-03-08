@@ -1,35 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import Header from './components/Header';
+import HeroCarousel from './components/HeroCarousel';
+import CategoriesGrid from './components/CategoriesGrid';
+import CategorySection from './components/CategorySection';
+import MagazineModal from './components/MagazineModal';
+import Footer from './components/Footer';
+import { useGallery } from './hooks/useGallery';
+import type { Category, Magazine } from './types';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data, loading, error } = useGallery();
+  const [selectedMagazine, setSelectedMagazine] = useState<Magazine | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCategoryClick = (category: Category) => {
+    const element = document.getElementById(category);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleMagazineClick = (magazine: Magazine) => {
+    setSelectedMagazine(magazine);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedMagazine(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen">
+      <Header />
+      <HeroCarousel />
+      <CategoriesGrid onCategoryClick={handleCategoryClick} />
+
+      {data && (
+        <>
+          <CategorySection
+            category="wardrobes"
+            magazines={data.wardrobes}
+            onMagazineClick={handleMagazineClick}
+          />
+          <CategorySection
+            category="sofas"
+            magazines={data.sofas}
+            onMagazineClick={handleMagazineClick}
+          />
+          <CategorySection
+            category="kitchens"
+            magazines={data.kitchens}
+            onMagazineClick={handleMagazineClick}
+          />
+        </>
+      )}
+
+      <Footer />
+
+      <MagazineModal
+        magazine={selectedMagazine}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </div>
+  );
 }
 
-export default App
+export default App;
