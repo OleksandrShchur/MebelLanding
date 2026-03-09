@@ -9,7 +9,7 @@ const MagazineCard = ({ magazine, onClick }: MagazineCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border border-[#E6E1DA]"
     >
       <img
         src={`${import.meta.env.BASE_URL}${magazine.images[0]}`}
@@ -18,9 +18,9 @@ const MagazineCard = ({ magazine, onClick }: MagazineCardProps) => {
         loading="lazy"
       />
       <div className="p-4">
-        <h3 className="text-lg font-semibold mb-2">{magazine.name}</h3>
-        <p className="text-gray-600 text-sm mb-2">{magazine.description}</p>
-        <p className="text-lg font-bold text-blue-600">${magazine.price}</p>
+        <h3 className="text-lg font-semibold mb-2 text-[#2F2A25]">{magazine.name}</h3>
+        <p className="text-[#5B544E] text-sm mb-2">{magazine.description}</p>
+        <p className="text-lg font-bold text-[#7C5A3A]">${magazine.price}</p>
       </div>
     </div>
   );

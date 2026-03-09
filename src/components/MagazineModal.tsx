@@ -35,7 +35,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
+          className="absolute top-4 right-4 z-10 bg-[#7C5A3A] text-white p-2 rounded-full hover:bg-[#6A4C31] transition-all"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -43,10 +43,10 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
         </button>
 
         {/* Magazine Info */}
-        <div className="absolute top-4 left-4 z-10 bg-white bg-opacity-90 p-4 rounded-lg">
-          <h2 className="text-xl font-bold">{magazine.name}</h2>
-          <p className="text-gray-600">{magazine.description}</p>
-          <p className="text-lg font-semibold text-blue-600">${magazine.price}</p>
+        <div className="absolute top-4 left-4 z-10 bg-white bg-opacity-90 p-4 rounded-lg border border-[#E6E1DA]">
+          <h2 className="text-xl font-bold text-[#2F2A25]">{magazine.name}</h2>
+          <p className="text-[#5B544E]">{magazine.description}</p>
+          <p className="text-lg font-semibold text-[#7C5A3A]">${magazine.price}</p>
         </div>
 
         {/* Flip Book Viewer */}

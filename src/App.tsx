@@ -32,22 +32,22 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F5F2]">
+        <div className="text-xl text-[#5B544E]">Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-red-600">Error: {error}</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F5F2]">
+        <div className="text-xl text-[#7C5A3A]">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F7F5F2]">
       <Header />
       <HeroCarousel />
       <CategoriesGrid onCategoryClick={handleCategoryClick} />

@@ -103,7 +103,7 @@ const FlipBookViewer = ({ images, orientation }: FlipBookViewerProps) => {
       {/* Navigation Buttons */}
       <button
         onClick={handlePrev}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-75 transition-all z-10"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -111,7 +111,7 @@ const FlipBookViewer = ({ images, orientation }: FlipBookViewerProps) => {
       </button>
       <button
         onClick={handleNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-75 transition-all z-10"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
