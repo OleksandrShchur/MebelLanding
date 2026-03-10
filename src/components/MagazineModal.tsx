@@ -46,7 +46,6 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
         <div className="absolute top-4 left-4 z-10 bg-white bg-opacity-90 p-4 rounded-lg border border-[#E6E1DA]">
           <h2 className="text-xl font-bold text-[#2F2A25]">{magazine.name}</h2>
           <p className="text-[#5B544E]">{magazine.description}</p>
-          <p className="text-lg font-semibold text-[#7C5A3A]">${magazine.price}</p>
         </div>
 
         {/* Flip Book Viewer */}
