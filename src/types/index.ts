@@ -2,7 +2,6 @@ export interface Magazine {
   id: number;
   name: string;
   description: string;
-  price: number;
   orientation: 'portrait' | 'landscape';
   images: string[];
 }
