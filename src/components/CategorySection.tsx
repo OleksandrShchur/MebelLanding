@@ -4,7 +4,7 @@ import MagazineCard from './MagazineCard';
 interface CategorySectionProps {
   category: Category;
   magazines: Magazine[];
-  onMagazineClick: (magazine: Magazine) => void;
+  onMagazineClick: (magazine: Magazine, category: Category) => void;
 }
 
 const CategorySection = ({ category, magazines, onMagazineClick }: CategorySectionProps) => {
@@ -23,7 +23,7 @@ const CategorySection = ({ category, magazines, onMagazineClick }: CategorySecti
             <MagazineCard
               key={magazine.id}
               magazine={magazine}
-              onClick={() => onMagazineClick(magazine)}
+              onClick={() => onMagazineClick(magazine, category)}
             />
           ))}
         </div>
