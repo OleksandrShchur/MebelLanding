@@ -49,7 +49,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
         </div>
 
         {/* Flip Book Viewer */}
-        <FlipBookViewer images={magazine.images} orientation={magazine.orientation} />
+        <FlipBookViewer images={magazine.images} orientation={magazine.orientation} pageDimensions={magazine.page} />
       </div>
     </div>
   );

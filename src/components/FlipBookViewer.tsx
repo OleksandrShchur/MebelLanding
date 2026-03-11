@@ -1,10 +1,11 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, forwardRef } from 'react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import HTMLFlipBook from 'react-pageflip';
 import { useSearchParams } from 'react-router-dom';
+import type { PageDimensions } from '../types';
 
 interface FlipBookRef {
-  pageFlip(): {
+  getPageFlip(): {
     flipNext(): void;
     flipPrev(): void;
     turnToPage(page: number): void;
@@ -15,9 +16,39 @@ interface FlipBookRef {
 interface FlipBookViewerProps {
   images: string[];
   orientation: 'portrait' | 'landscape';
+  pageDimensions: PageDimensions;
 }
 
-const FlipBookViewer = ({ images, orientation }: FlipBookViewerProps) => {
+const DISPLAY_HEIGHT = 600;
+
+function getPageSlotDimensions(pageDimensions: PageDimensions) {
+  const scale = DISPLAY_HEIGHT / pageDimensions.height;
+  return {
+    width: Math.round(pageDimensions.width * scale),
+    height: DISPLAY_HEIGHT,
+  };
+}
+
+interface PageProps {
+  src: string;
+  alt: string;
+  orientation: 'portrait' | 'landscape';
+}
+
+// Passing src/alt directly into Page avoids needing children manipulation
+const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, orientation }, ref) => (
+  <div ref={ref} className="page bg-white flex items-center justify-center overflow-hidden">
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      style={{ aspectRatio: orientation === 'portrait' ? '3 / 4' : '4 / 3' }}
+      className="max-w-full max-h-full object-contain"
+    />
+  </div>
+));
+
+const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get('page') || '0')
@@ -26,8 +57,10 @@ const FlipBookViewer = ({ images, orientation }: FlipBookViewerProps) => {
   const bookRef = useRef<FlipBookRef | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  const pagesPerView = isMobile ? 1 : 2;
-  const effectivePagesPerView = orientation === 'landscape' && !isMobile ? 1 : pagesPerView;
+  // spread is the sole layout driver; mobile overrides to single as a UX fallback
+  const isSinglePage = isMobile || pageDimensions.spread === 'single';
+
+  const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions);
 
   const handleFlip = useCallback(
     (e: any) => {
@@ -40,94 +73,48 @@ const FlipBookViewer = ({ images, orientation }: FlipBookViewerProps) => {
     [currentPage, setSearchParams]
   );
 
-  // Jump to the page from URL when the book is ready
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const pageFlip = bookRef.current?.pageFlip();
+      const pageFlip = bookRef.current?.getPageFlip();
       if (pageFlip && currentPage > 0) {
         pageFlip.turnToPage(currentPage);
       }
-    }, 300); // small delay so the book has rendered its pages
-
+    }, 300);
     return () => clearTimeout(timeout);
-  }, [currentPage]);
+  }, []);
 
-  const handleNext = () => {
-    bookRef.current?.pageFlip()?.flipNext();
-    // onFlip will update state + URL automatically
-  };
-
-  const handlePrev = () => {
-    bookRef.current?.pageFlip()?.flipPrev();
-  };
-
-  const createPages = () => {
-    const pages = [];
-    if (effectivePagesPerView === 1) {
-      images.forEach((image, index) => {
-        pages.push(
-          <div key={index} className="page bg-white flex items-center justify-center">
-            <img
-              src={`${import.meta.env.BASE_URL}${image}`}
-              alt={`Page ${index + 1}`}
-              className={`max-w-full max-h-full object-contain ${orientation === 'landscape' ? 'w-full' : 'h-full'}`}
-              loading="lazy"
-            />
-          </div>
-        );
-      });
-    } else {
-      for (let i = 0; i < images.length; i += 2) {
-        pages.push(
-          <div key={i} className="page bg-white flex">
-            <div className="flex-1 flex items-center justify-center p-2">
-              <img
-                src={`${import.meta.env.BASE_URL}${images[i]}`}
-                alt={`Page ${i + 1}`}
-                className="max-w-full max-h-full object-contain"
-                loading="lazy"
-              />
-            </div>
-            {images[i + 1] && (
-              <div className="flex-1 flex items-center justify-center p-2">
-                <img
-                  src={`${import.meta.env.BASE_URL}${images[i + 1]}`}
-                  alt={`Page ${i + 2}`}
-                  className="max-w-full max-h-full object-contain"
-                  loading="lazy"
-                />
-              </div>
-            )}
-          </div>
-        );
-      }
-    }
-    return pages;
-  };
+  const handleNext = () => bookRef.current?.getPageFlip()?.flipNext();
+  const handlePrev = () => bookRef.current?.getPageFlip()?.flipPrev();
 
   return (
     <div className="relative w-full h-full">
       <HTMLFlipBook
         ref={bookRef}
-        width={800}
-        height={600}
+        width={pageWidth}
+        height={pageHeight}
         size="stretch"
-        minWidth={400}
-        maxWidth={1000}
-        minHeight={300}
-        maxHeight={800}
+        minWidth={Math.round(pageWidth * 0.4)}
+        maxWidth={Math.round(pageWidth * 1.5)}
+        minHeight={Math.round(pageHeight * 0.4)}
+        maxHeight={Math.round(pageHeight * 1.5)}
         showCover={true}
         mobileScrollSupport={true}
         onFlip={handleFlip}
         className="flip-book"
       >
-        {createPages()}
+        {images.map((image, index) => (
+          <Page
+            key={index}
+            src={`${import.meta.env.BASE_URL}${image}`}
+            alt={`Page ${index + 1}`}
+            orientation={orientation}
+          />
+        ))}
       </HTMLFlipBook>
 
-      {/* Navigation Buttons */}
       <button
         onClick={handlePrev}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -136,7 +123,7 @@ const FlipBookViewer = ({ images, orientation }: FlipBookViewerProps) => {
 
       <button
         onClick={handleNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
