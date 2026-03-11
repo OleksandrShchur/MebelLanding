@@ -14,8 +14,8 @@ function App() {
   const navigate = useNavigate();
 
   const { category, magazineId } = parseCatalogParams(location.pathname);
-  const selectedMagazine = data && category && magazineId && isValidCategory(category) && isValidId(magazineId) 
-    ? findMagazineByCategoryAndId(data, category as Category, parseInt(magazineId)) 
+  const selectedMagazine = data && category && magazineId && isValidCategory(category) && isValidId(magazineId)
+    ? findMagazineByCategoryAndId(data, category as Category, parseInt(magazineId))
     : null;
   const isModalOpen = !!selectedMagazine;
 
@@ -26,8 +26,8 @@ function App() {
     }
   };
 
-  const handleMagazineClick = (magazine: Magazine, category: Category) => {
-    navigate(`/catalog/${category}/${magazine.id}`);
+  const handleMagazineClick = (magazine: Magazine, category: Category, page: number) => {
+    navigate(`/catalog/${category}/${magazine.id}?page=${page}`);
   };
 
   const handleCloseModal = () => {
