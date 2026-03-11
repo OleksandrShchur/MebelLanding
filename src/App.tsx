@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import HeroCarousel from './components/HeroCarousel';
 import CategoriesGrid from './components/CategoriesGrid';
@@ -10,8 +10,14 @@ import type { Category, Magazine } from './types';
 
 function App() {
   const { data, loading, error } = useGallery();
-  const [selectedMagazine, setSelectedMagazine] = useState<Magazine | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const { category, magazineId } = parseCatalogParams(location.pathname);
+  const selectedMagazine = data && category && magazineId && isValidCategory(category) && isValidId(magazineId)
+    ? findMagazineByCategoryAndId(data, category as Category, parseInt(magazineId))
+    : null;
+  const isModalOpen = !!selectedMagazine;
 
   const handleCategoryClick = (category: Category) => {
     const element = document.getElementById(category);
@@ -20,14 +26,12 @@ function App() {
     }
   };
 
-  const handleMagazineClick = (magazine: Magazine) => {
-    setSelectedMagazine(magazine);
-    setIsModalOpen(true);
+  const handleMagazineClick = (magazine: Magazine, category: Category, page: number) => {
+    navigate(`/catalog/${category}/${magazine.id}?page=${page}`);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedMagazine(null);
+    navigate('/');
   };
 
   if (loading) {
@@ -81,6 +85,26 @@ function App() {
       />
     </div>
   );
+}
+
+function findMagazineByCategoryAndId(data: { wardrobes: Magazine[]; sofas: Magazine[]; kitchens: Magazine[] }, category: Category, id: number): Magazine | null {
+  return data[category].find(magazine => magazine.id === id) || null;
+}
+
+function isValidCategory(category: string): category is Category {
+  return ['wardrobes', 'sofas', 'kitchens'].includes(category);
+}
+
+function isValidId(id: string): boolean {
+  return !isNaN(parseInt(id)) && parseInt(id) > 0;
+}
+
+function parseCatalogParams(pathname: string): { category: string | null; magazineId: string | null } {
+  const parts = pathname.split('/').filter(Boolean);
+  if (parts.length >= 3 && parts[0] === 'catalog') {
+    return { category: parts[1], magazineId: parts[2] };
+  }
+  return { category: null, magazineId: null };
 }
 
 export default App;
