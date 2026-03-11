@@ -13,7 +13,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md border-b border-[#E6E1DA]">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-2 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-[#2F2A25]">Mebel</h1>
 
         {/* Desktop Navigation */}
