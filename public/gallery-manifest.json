@@ -6,8 +6,8 @@
       "description": "A sleek and contemporary wardrobe with ample storage.",
       "orientation": "portrait",
       "page": {
-        "width": 595,
-        "height": 842,
+        "width": 3508,
+        "height": 4961,
         "spread": "double"
       },
       "images": [
@@ -25,13 +25,21 @@
       "description": "Timeless design with elegant finishes.",
       "orientation": "landscape",
       "page": {
-        "width": 595,
-        "height": 842,
-        "spread": "double"
+        "width": 2481,
+        "height": 1182,
+        "spread": "single"
       },
       "images": [
-        "/images/img_1.jpg",
-        "/images/img_2.jpg"
+        "/images/wide_1.jpg",
+        "/images/wide_2.jpg",
+        "/images/wide_3.jpg",
+        "/images/wide_4.jpg",
+        "/images/wide_5.jpg",
+        "/images/wide_6.jpg",
+        "/images/wide_7.jpg",
+        "/images/wide_8.jpg",
+        "/images/wide_9.jpg",
+        "/images/wide_10.jpg"
       ]
     }
   ],
@@ -40,10 +48,10 @@
       "id": 1,
       "name": "Modern Sofa",
       "description": "A sleek and contemporary sofa with clean lines.",
-      "orientation": "portrait",
+      "orientation": "landscape",
       "page": {
-        "width": 595,
-        "height": 842,
+        "width": 1595,
+        "height": 1842,
         "spread": "double"
       },
       "images": [
