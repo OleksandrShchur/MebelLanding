@@ -33,22 +33,23 @@ function getPageSlotDimensions(pageDimensions: PageDimensions, displayHeight: nu
 interface PageProps {
   src: string;
   alt: string;
-  orientation: 'portrait' | 'landscape';
+  width: number;
+  height: number;
 }
 
-const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, orientation }, ref) => (
+const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, width, height }, ref) => (
   <div ref={ref} className="page bg-white flex items-center justify-center overflow-hidden">
     <img
       src={src}
       alt={alt}
       loading="lazy"
-      style={{ aspectRatio: orientation === 'portrait' ? '3 / 4' : '4 / 3' }}
-      className="max-w-full max-h-full object-contain"
+      style={{ aspectRatio: `${width} / ${height}` }}
+      className="max-w-full max-h-full object-scale-down"
     />
   </div>
 ));
 
-const FlipBookViewer = ({ images, orientation, pageDimensions, displayHeight }: FlipBookViewerProps) => {
+const FlipBookViewer = ({ images, pageDimensions, displayHeight }: FlipBookViewerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get('page') || '0')
@@ -104,9 +105,9 @@ const FlipBookViewer = ({ images, orientation, pageDimensions, displayHeight }: 
       <HTMLFlipBook
         ref={bookRef}
         key={isMobile ? 'mobile' : 'desktop'}
-        width={pageWidth}
+        width={pageWidth - 8} // Account for padding/margin
         height={pageHeight}
-        size="stretch"
+        size={isMobile ? "fixed" : "stretch"}
         minWidth={Math.round(pageWidth * 0.4)}
         maxWidth={Math.round(pageWidth * 1.5)}
         minHeight={Math.round(pageHeight * 0.4)}
@@ -134,7 +135,8 @@ const FlipBookViewer = ({ images, orientation, pageDimensions, displayHeight }: 
             key={index}
             src={`${import.meta.env.BASE_URL}${image}`}
             alt={`Page ${index + 1}`}
-            orientation={orientation}
+            width={pageWidth}
+            height={pageHeight}
           />
         ))}
       </HTMLFlipBook>
