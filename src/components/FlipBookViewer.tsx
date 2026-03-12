@@ -17,15 +17,16 @@ interface FlipBookViewerProps {
   images: string[];
   orientation: 'portrait' | 'landscape';
   pageDimensions: PageDimensions;
+  displayHeight?: number;
 }
 
-const DISPLAY_HEIGHT = 600;
+const DEFAULT_DISPLAY_HEIGHT = 600;
 
-function getPageSlotDimensions(pageDimensions: PageDimensions) {
-  const scale = DISPLAY_HEIGHT / pageDimensions.height;
+function getPageSlotDimensions(pageDimensions: PageDimensions, displayHeight: number) {
+  const scale = displayHeight / pageDimensions.height;
   return {
     width: Math.round(pageDimensions.width * scale),
-    height: DISPLAY_HEIGHT,
+    height: displayHeight,
   };
 }
 
@@ -47,16 +48,18 @@ const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, orientation }, r
   </div>
 ));
 
-const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerProps) => {
+const FlipBookViewer = ({ images, orientation, pageDimensions, displayHeight }: FlipBookViewerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get('page') || '0')
   );
+  const [ready, setReady] = useState(false);
 
   const bookRef = useRef<FlipBookRef | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions);
+  const resolvedHeight = displayHeight ?? DEFAULT_DISPLAY_HEIGHT;
+  const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions, resolvedHeight);
 
   const handleFlip = useCallback(
     (e: any) => {
@@ -70,6 +73,11 @@ const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerP
   );
 
   useEffect(() => {
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
     const timeout = setTimeout(() => {
       const pageFlip = bookRef.current?.pageFlip();
       if (pageFlip && currentPage > 0) {
@@ -77,15 +85,25 @@ const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerP
       }
     }, 300);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [ready]);
 
   const handleNext = () => bookRef.current?.pageFlip()?.flipNext();
   const handlePrev = () => bookRef.current?.pageFlip()?.flipPrev();
+
+  if (!ready) {
+    return (
+      <div
+        className="relative w-full h-full"
+        style={{ minHeight: pageHeight }}
+      />
+    );
+  }
 
   return (
     <div className="relative w-full h-full">
       <HTMLFlipBook
         ref={bookRef}
+        key={isMobile ? 'mobile' : 'desktop'}
         width={pageWidth}
         height={pageHeight}
         size="stretch"
@@ -94,7 +112,7 @@ const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerP
         minHeight={Math.round(pageHeight * 0.4)}
         maxHeight={Math.round(pageHeight * 1.5)}
         showCover={false}
-        mobileScrollSupport={true}
+        mobileScrollSupport={false}
         onFlip={handleFlip}
         className="flip-book"
         usePortrait={isMobile}
