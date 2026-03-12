@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import type { PageDimensions } from '../types';
 
 interface FlipBookRef {
-  getPageFlip(): {
+  pageFlip(): {
     flipNext(): void;
     flipPrev(): void;
     turnToPage(page: number): void;
@@ -35,7 +35,6 @@ interface PageProps {
   orientation: 'portrait' | 'landscape';
 }
 
-// Passing src/alt directly into Page avoids needing children manipulation
 const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, orientation }, ref) => (
   <div ref={ref} className="page bg-white flex items-center justify-center overflow-hidden">
     <img
@@ -57,9 +56,6 @@ const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerP
   const bookRef = useRef<FlipBookRef | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // spread is the sole layout driver; mobile overrides to single as a UX fallback
-  const isSinglePage = isMobile || pageDimensions.spread === 'single';
-
   const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions);
 
   const handleFlip = useCallback(
@@ -75,7 +71,7 @@ const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerP
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const pageFlip = bookRef.current?.getPageFlip();
+      const pageFlip = bookRef.current?.pageFlip();
       if (pageFlip && currentPage > 0) {
         pageFlip.turnToPage(currentPage);
       }
@@ -83,8 +79,8 @@ const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerP
     return () => clearTimeout(timeout);
   }, []);
 
-  const handleNext = () => bookRef.current?.getPageFlip()?.flipNext();
-  const handlePrev = () => bookRef.current?.getPageFlip()?.flipPrev();
+  const handleNext = () => bookRef.current?.pageFlip()?.flipNext();
+  const handlePrev = () => bookRef.current?.pageFlip()?.flipPrev();
 
   return (
     <div className="relative w-full h-full">
@@ -97,10 +93,11 @@ const FlipBookViewer = ({ images, orientation, pageDimensions }: FlipBookViewerP
         maxWidth={Math.round(pageWidth * 1.5)}
         minHeight={Math.round(pageHeight * 0.4)}
         maxHeight={Math.round(pageHeight * 1.5)}
-        showCover={true}
+        showCover={false}
         mobileScrollSupport={true}
         onFlip={handleFlip}
         className="flip-book"
+        usePortrait={isMobile}
       >
         {images.map((image, index) => (
           <Page
