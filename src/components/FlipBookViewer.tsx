@@ -116,6 +116,18 @@ const FlipBookViewer = ({ images, orientation, pageDimensions, displayHeight }: 
         onFlip={handleFlip}
         className="flip-book"
         usePortrait={isMobile}
+        startPage={0}
+        drawShadow={true}
+        flippingTime={1000}
+        startZIndex={0}
+        autoSize={true}
+        maxShadowOpacity={1}
+        clickEventForward={true}
+        useMouseEvents={true}
+        swipeDistance={30}
+        showPageCorners={false}
+        disableFlipByClick={false}
+        style={{}}
       >
         {images.map((image, index) => (
           <Page
