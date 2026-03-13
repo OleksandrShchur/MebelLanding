@@ -79,6 +79,7 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight }: FlipBookViewe
 
   useEffect(() => {
     if (!ready) return;
+
     const timeout = setTimeout(() => {
       const pageFlip = bookRef.current?.pageFlip();
       if (pageFlip && currentPage > 0) {
@@ -104,7 +105,7 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight }: FlipBookViewe
     <div className="relative w-full h-full">
       <HTMLFlipBook
         ref={bookRef}
-        key={isMobile ? 'mobile' : 'desktop'}
+        key={`${isMobile ? 'mobile' : 'desktop'}-${pageWidth}x${pageHeight}`}
         width={pageWidth - 8} // Account for padding/margin
         height={pageHeight}
         size={isMobile ? "fixed" : "stretch"}

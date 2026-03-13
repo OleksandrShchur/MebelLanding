@@ -91,6 +91,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
         </button>
 
         <FlipBookViewer
+          key={`${width}x${height}`}
           images={magazine.images}
           orientation={magazine.orientation}
           pageDimensions={magazine.page}
