@@ -11,7 +11,6 @@ interface MagazineModalProps {
 }
 
 const PADDING = 8;
-const SWITCH_HEIGHT = 44;
 const ARROW_WIDTH = 56;
 
 function getModalDimensions(
@@ -24,8 +23,8 @@ function getModalDimensions(
   const pageAspect = magazine.page.width / magazine.page.height;
   const spreadAspect = (isMobile || singlePage) ? pageAspect : pageAspect * 2;
 
-  const availW = viewportWidth - PADDING * 2 - (isMobile ? 0 : ARROW_WIDTH * 2);
-  const availH = viewportHeight - PADDING * 2 - SWITCH_HEIGHT;
+  const availW = viewportWidth - PADDING * 4 - (isMobile ? 0 : ARROW_WIDTH * 2);
+  const availH = viewportHeight - PADDING * 4;
 
   let width = availW;
   let height = width / spreadAspect;
@@ -85,8 +84,9 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     viewport.height
   );
 
-  const totalWidth = isMobile ? width : width + ARROW_WIDTH * 2;
-  const totalHeight = height + SWITCH_HEIGHT;
+  const totalWidth = isMobile
+    ? Math.min(width, viewport.width - PADDING * 2)
+    : width + ARROW_WIDTH * 2;
 
   return (
     <div
@@ -95,42 +95,35 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     >
       {/* Modal content */}
       <div
-        className="relative bg-white rounded-lg overflow-hidden flex flex-col"
-        style={{ width: totalWidth, height: totalHeight }}
+        className="relative bg-white rounded-lg overflow-hidden"
+        style={{ width: totalWidth, height }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top bar — close button only */}
-        <div
-          className="flex items-center justify-end px-3 py-2 bg-white border-b border-gray-100 shrink-0"
-          style={{ height: SWITCH_HEIGHT }}
-        >
-          <button
-            onClick={onClose}
-            className="bg-[#7C5A3A] text-white p-2 rounded-full hover:bg-[#6A4C31] transition-all"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
         {/* Book area */}
-        <div className="flex-1 min-h-0 relative">
-          <FlipBookViewer
-            key={`${width}x${height}-${effectiveSinglePage}`}
-            images={magazine.images}
-            orientation={magazine.orientation}
-            pageDimensions={magazine.page}
-            displayHeight={height}
-            singlePage={effectiveSinglePage}
-          />
-        </div>
+        <FlipBookViewer
+          key={`${width}x${height}-${effectiveSinglePage}`}
+          images={magazine.images}
+          orientation={magazine.orientation}
+          pageDimensions={magazine.page}
+          displayHeight={height}
+          singlePage={effectiveSinglePage}
+        />
+
+        {/* Close button — absolute top-right corner */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 bg-[#7C5A3A] text-white p-2 rounded-full hover:bg-[#6A4C31] transition-all z-10 shadow-md"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      {/* Toggle */}
+      {/* Toggle — desktop only, fixed to bottom center of screen */}
       {!isMobile && (
         <div
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg rounded-full px-4 py-2 z-[60]"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg rounded-full px-4 py-2 z-[60]"
           onClick={(e) => e.stopPropagation()}
         >
           <span
@@ -141,7 +134,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
           </span>
 
           <ToggleButton
-            value={singlePage}
+            value={!singlePage}
             onToggle={() => setSinglePage((prev) => !prev)}
             colors={{
               activeThumb: { base: '#ffffff' },
