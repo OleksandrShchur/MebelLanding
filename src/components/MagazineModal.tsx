@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Magazine } from '../types';
 import FlipBookViewer from './FlipBookViewer';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import ToggleButton from 'react-toggle-button';
 
 interface MagazineModalProps {
   magazine: Magazine | null;
@@ -10,7 +11,7 @@ interface MagazineModalProps {
 }
 
 const PADDING = 8;
-const SWITCH_HEIGHT = 48;
+const SWITCH_HEIGHT = 44;
 const ARROW_WIDTH = 56;
 
 function getModalDimensions(
@@ -92,40 +93,17 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
       className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
       onClick={onClose}
     >
+      {/* Modal content */}
       <div
         className="relative bg-white rounded-lg overflow-hidden flex flex-col"
         style={{ width: totalWidth, height: totalHeight }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top bar — toggle + close */}
-        <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-gray-100 shrink-0" style={{ height: SWITCH_HEIGHT }}>
-          {!isMobile ? (
-            <>
-              <div className="w-8" />
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setSinglePage(true)}
-                  className={`px-4 py-1 rounded-full text-sm font-medium transition-all ${singlePage
-                    ? 'bg-[#7C5A3A] text-white'
-                    : 'text-[#7C5A3A] hover:bg-[#f5ede6]'
-                    }`}
-                >
-                  Single page
-                </button>
-                <button
-                  onClick={() => setSinglePage(false)}
-                  className={`px-4 py-1 rounded-full text-sm font-medium transition-all ${!singlePage
-                    ? 'bg-[#7C5A3A] text-white'
-                    : 'text-[#7C5A3A] hover:bg-[#f5ede6]'
-                    }`}
-                >
-                  Double page
-                </button>
-              </div>
-            </>
-          ) : (
-            <div />
-          )}
+        {/* Top bar — close button only */}
+        <div
+          className="flex items-center justify-end px-3 py-2 bg-white border-b border-gray-100 shrink-0"
+          style={{ height: SWITCH_HEIGHT }}
+        >
           <button
             onClick={onClose}
             className="bg-[#7C5A3A] text-white p-2 rounded-full hover:bg-[#6A4C31] transition-all"
@@ -136,7 +114,8 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
           </button>
         </div>
 
-        <div className="flex-1 min-h-0">
+        {/* Book area */}
+        <div className="flex-1 min-h-0 relative">
           <FlipBookViewer
             key={`${width}x${height}-${effectiveSinglePage}`}
             images={magazine.images}
@@ -147,6 +126,45 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
           />
         </div>
       </div>
+
+      {/* Toggle */}
+      {!isMobile && (
+        <div
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg rounded-full px-4 py-2 z-[60]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span
+            className={`text-sm font-medium transition-colors select-none ${singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'
+              }`}
+          >
+            Single
+          </span>
+
+          <ToggleButton
+            value={singlePage}
+            onToggle={() => setSinglePage((prev) => !prev)}
+            colors={{
+              activeThumb: { base: '#ffffff' },
+              inactiveThumb: { base: '#ffffff' },
+              active: {
+                base: '#7C5A3A',
+                hover: '#6A4C31',
+              },
+              inactive: {
+                base: '#d1d5db',
+                hover: '#9ca3af',
+              },
+            }}
+          />
+
+          <span
+            className={`text-sm font-medium transition-colors select-none ${!singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'
+              }`}
+          >
+            Double
+          </span>
+        </div>
+      )}
     </div>
   );
 };
