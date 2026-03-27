@@ -18,6 +18,7 @@ interface FlipBookViewerProps {
   orientation: 'portrait' | 'landscape';
   pageDimensions: PageDimensions;
   displayHeight?: number;
+  singlePage: boolean;
 }
 
 const DEFAULT_DISPLAY_HEIGHT = 600;
@@ -49,7 +50,7 @@ const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, width, height },
   </div>
 ));
 
-const FlipBookViewer = ({ images, pageDimensions, displayHeight }: FlipBookViewerProps) => {
+const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage }: FlipBookViewerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get('page') || '0')
@@ -79,6 +80,7 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight }: FlipBookViewe
 
   useEffect(() => {
     if (!ready) return;
+
     const timeout = setTimeout(() => {
       const pageFlip = bookRef.current?.pageFlip();
       if (pageFlip && currentPage > 0) {
@@ -101,58 +103,102 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight }: FlipBookViewe
   }
 
   return (
-    <div className="relative w-full h-full">
-      <HTMLFlipBook
-        ref={bookRef}
-        key={isMobile ? 'mobile' : 'desktop'}
-        width={pageWidth - 8} // Account for padding/margin
-        height={pageHeight}
-        size={isMobile ? "fixed" : "stretch"}
-        minWidth={Math.round(pageWidth * 0.4)}
-        maxWidth={Math.round(pageWidth * 1.5)}
-        minHeight={Math.round(pageHeight * 0.4)}
-        maxHeight={Math.round(pageHeight * 1.5)}
-        showCover={false}
-        mobileScrollSupport={false}
-        onFlip={handleFlip}
-        className="flip-book"
-        usePortrait={isMobile}
-        startPage={0}
-        drawShadow={true}
-        flippingTime={1000}
-        startZIndex={0}
-        autoSize={true}
-        maxShadowOpacity={1}
-        clickEventForward={true}
-        useMouseEvents={true}
-        swipeDistance={30}
-        showPageCorners={false}
-        disableFlipByClick={false}
-        style={{}}
-      >
-        {images.map((image, index) => (
-          <Page
-            key={index}
-            src={`${import.meta.env.BASE_URL}${image}`}
-            alt={`Page ${index + 1}`}
-            width={pageWidth}
-            height={pageHeight}
-          />
-        ))}
-      </HTMLFlipBook>
-
+    <div className="w-full h-full flex items-center">
       <button
         onClick={handlePrev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
+        className="shrink-0 mx-2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
+      <div className="flex-1 h-full min-w-0">
+        {singlePage && (
+          <HTMLFlipBook
+            ref={bookRef}
+            key={`${isMobile ? 'mobile' : 'desktop'}-${pageWidth}x${pageHeight}-${singlePage}`}
+            width={pageWidth - 8}
+            height={pageHeight}
+            size='fixed'
+            minWidth={Math.round(pageWidth * 0.4)}
+            maxWidth={Math.round(pageWidth * 1.5)}
+            minHeight={Math.round(pageHeight * 0.4)}
+            maxHeight={Math.round(pageHeight * 1.5)}
+            showCover={false}
+            mobileScrollSupport={false}
+            onFlip={handleFlip}
+            className="flip-book"
+            usePortrait={singlePage}
+            startPage={0}
+            drawShadow={true}
+            flippingTime={1000}
+            startZIndex={0}
+            autoSize={false}
+            maxShadowOpacity={1}
+            clickEventForward={true}
+            useMouseEvents={true}
+            swipeDistance={30}
+            showPageCorners={false}
+            disableFlipByClick={false}
+            style={{}}
+          >
+            {images.map((image, index) => (
+              <Page
+                key={index}
+                src={`${import.meta.env.BASE_URL}${image}`}
+                alt={`Page ${index + 1}`}
+                width={pageWidth}
+                height={pageHeight}
+              />
+            ))}
+          </HTMLFlipBook>
+        )}
+        {!singlePage && (
+          <HTMLFlipBook
+            ref={bookRef}
+            key={`${isMobile ? 'mobile' : 'desktop'}-${pageWidth}x${pageHeight}-${singlePage}`}
+            width={pageWidth - 8}
+            height={pageHeight}
+            size={isMobile ? 'fixed' : 'stretch'}
+            minWidth={Math.round(pageWidth * 0.4)}
+            maxWidth={Math.round(pageWidth * 1.5)}
+            minHeight={Math.round(pageHeight * 0.4)}
+            maxHeight={Math.round(pageHeight * 1.5)}
+            showCover={false}
+            mobileScrollSupport={false}
+            onFlip={handleFlip}
+            className="flip-book"
+            usePortrait={isMobile || singlePage}
+            startPage={0}
+            drawShadow={true}
+            flippingTime={1000}
+            startZIndex={0}
+            autoSize={true}
+            maxShadowOpacity={1}
+            clickEventForward={true}
+            useMouseEvents={true}
+            swipeDistance={30}
+            showPageCorners={false}
+            disableFlipByClick={false}
+            style={{}}
+          >
+            {images.map((image, index) => (
+              <Page
+                key={index}
+                src={`${import.meta.env.BASE_URL}${image}`}
+                alt={`Page ${index + 1}`}
+                width={pageWidth}
+                height={pageHeight}
+              />
+            ))}
+          </HTMLFlipBook>
+        )}
+      </div>
+
       <button
         onClick={handleNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
+        className="shrink-0 mx-2 bg-[#7C5A3A] text-white p-3 rounded-full hover:bg-[#6A4C31] transition-all z-10"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

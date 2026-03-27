@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Magazine } from '../types';
 import FlipBookViewer from './FlipBookViewer';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import ToggleButton from 'react-toggle-button';
 
 interface MagazineModalProps {
   magazine: Magazine | null;
@@ -10,18 +11,21 @@ interface MagazineModalProps {
 }
 
 const PADDING = 8;
+const SWITCH_HEIGHT = 44;
+const ARROW_WIDTH = 56;
 
 function getModalDimensions(
   magazine: Magazine,
   isMobile: boolean,
+  singlePage: boolean,
   viewportWidth: number,
   viewportHeight: number
 ) {
   const pageAspect = magazine.page.width / magazine.page.height;
-  const spreadAspect = isMobile ? pageAspect : pageAspect * 2;
+  const spreadAspect = (isMobile || singlePage) ? pageAspect : pageAspect * 2;
 
-  const availW = viewportWidth - PADDING * 2;
-  const availH = viewportHeight - PADDING * 2;
+  const availW = viewportWidth - PADDING * 2 - (isMobile ? 0 : ARROW_WIDTH * 2);
+  const availH = viewportHeight - PADDING * 2 - SWITCH_HEIGHT;
 
   let width = availW;
   let height = width / spreadAspect;
@@ -36,6 +40,7 @@ function getModalDimensions(
 
 const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [singlePage, setSinglePage] = useState(false);
   const [viewport, setViewport] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -47,6 +52,12 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    if (magazine) {
+      setSinglePage(magazine.page.spread === 'single');
+    }
+  }, [magazine?.id]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -64,39 +75,96 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
   if (!isOpen || !magazine) return null;
 
+  const effectiveSinglePage = isMobile ? true : singlePage;
+
   const { width, height } = getModalDimensions(
     magazine,
     isMobile,
+    singlePage,
     viewport.width,
     viewport.height
   );
+
+  const totalWidth = isMobile ? width : width + ARROW_WIDTH * 2;
+  const totalHeight = height + SWITCH_HEIGHT;
 
   return (
     <div
       className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
       onClick={onClose}
     >
+      {/* Modal content */}
       <div
-        className="relative bg-white rounded-lg overflow-hidden"
-        style={{ width, height }}
+        className="relative bg-white rounded-lg overflow-hidden flex flex-col"
+        style={{ width: totalWidth, height: totalHeight }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 z-10 bg-[#7C5A3A] text-white p-2 rounded-full hover:bg-[#6A4C31] transition-all"
+        {/* Top bar — close button only */}
+        <div
+          className="flex items-center justify-end px-3 py-2 bg-white border-b border-gray-100 shrink-0"
+          style={{ height: SWITCH_HEIGHT }}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+          <button
+            onClick={onClose}
+            className="bg-[#7C5A3A] text-white p-2 rounded-full hover:bg-[#6A4C31] transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-        <FlipBookViewer
-          images={magazine.images}
-          orientation={magazine.orientation}
-          pageDimensions={magazine.page}
-          displayHeight={height}
-        />
+        {/* Book area */}
+        <div className="flex-1 min-h-0 relative">
+          <FlipBookViewer
+            key={`${width}x${height}-${effectiveSinglePage}`}
+            images={magazine.images}
+            orientation={magazine.orientation}
+            pageDimensions={magazine.page}
+            displayHeight={height}
+            singlePage={effectiveSinglePage}
+          />
+        </div>
       </div>
+
+      {/* Toggle */}
+      {!isMobile && (
+        <div
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg rounded-full px-4 py-2 z-[60]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span
+            className={`text-sm font-medium transition-colors select-none ${singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'
+              }`}
+          >
+            Single
+          </span>
+
+          <ToggleButton
+            value={singlePage}
+            onToggle={() => setSinglePage((prev) => !prev)}
+            colors={{
+              activeThumb: { base: '#ffffff' },
+              inactiveThumb: { base: '#ffffff' },
+              active: {
+                base: '#7C5A3A',
+                hover: '#6A4C31',
+              },
+              inactive: {
+                base: '#d1d5db',
+                hover: '#9ca3af',
+              },
+            }}
+          />
+
+          <span
+            className={`text-sm font-medium transition-colors select-none ${!singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'
+              }`}
+          >
+            Double
+          </span>
+        </div>
+      )}
     </div>
   );
 };
