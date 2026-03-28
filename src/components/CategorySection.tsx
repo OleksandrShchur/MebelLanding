@@ -9,9 +9,9 @@ interface CategorySectionProps {
 
 const CategorySection = ({ category, magazines, onMagazineClick }: CategorySectionProps) => {
   const categoryNames = {
-    wardrobes: 'Wardrobes',
-    sofas: 'Sofas',
-    kitchens: 'Kitchens'
+    wardrobes: 'Шафи',
+    sofas: 'Дивани',
+    kitchens: 'Кухні'
   };
 
   return (

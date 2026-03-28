@@ -17,7 +17,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md border-b border-[#E6E1DA]">
       <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-[#2F2A25]">Mebel</h1>
+        <h1 className="text-2xl font-bold text-[#2F2A25]">Магазин Mebel</h1>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
@@ -25,19 +25,19 @@ const Header = () => {
             onClick={() => scrollToSection('hero')}
             className="text-[#5B544E] hover:text-[#2F2A25] transition-colors"
           >
-            Home
+            Головна
           </button>
           <button
             onClick={() => scrollToSection('categories')}
             className="text-[#5B544E] hover:text-[#2F2A25] transition-colors"
           >
-            Categories
+            Каталоги
           </button>
           <button
             onClick={() => scrollToSection('footer')}
             className="text-[#5B544E] hover:text-[#2F2A25] transition-colors"
           >
-            Contacts
+            Контакти
           </button>
         </nav>
 
@@ -60,19 +60,19 @@ const Header = () => {
               onClick={() => scrollToSection('hero')}
               className="block w-full text-left py-2 text-[#5B544E] hover:text-[#2F2A25]"
             >
-              Home
+              Головна
             </button>
             <button
               onClick={() => scrollToSection('categories')}
               className="block w-full text-left py-2 text-[#5B544E] hover:text-[#2F2A25]"
             >
-              Categories
+              Каталоги
             </button>
             <button
               onClick={() => scrollToSection('footer')}
               className="block w-full text-left py-2 text-[#5B544E] hover:text-[#2F2A25]"
             >
-              Contacts
+              Контакти
             </button>
           </div>
         </div>
