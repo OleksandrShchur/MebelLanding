@@ -142,7 +142,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
               onClick={(e) => e.stopPropagation()}
             >
               <span className={`text-sm font-medium select-none transition-colors ${singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'}`}>
-                Single
+                Одна
               </span>
               <ToggleButton
                 value={!singlePage}
@@ -155,7 +155,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                 }}
               />
               <span className={`text-sm font-medium select-none transition-colors ${!singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'}`}>
-                Double
+                Розворот
               </span>
             </div>
           )}
