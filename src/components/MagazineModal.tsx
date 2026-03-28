@@ -11,7 +11,7 @@ interface MagazineModalProps {
 }
 
 const PADDING = 8;
-const ARROW_WIDTH = 56;
+const ARROW_WIDTH = 48;
 
 function getModalDimensions(
   magazine: Magazine,
@@ -44,6 +44,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const [flipRef, setFlipRef] = useState<any>(null);
 
   useEffect(() => {
     const handleResize = () =>
@@ -84,6 +85,9 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     viewport.height
   );
 
+  const BOTTOM_PADDING = 40;
+  const TOP_PADDING = 16;
+
   const totalWidth = isMobile
     ? Math.min(width, viewport.width - PADDING * 2)
     : width + ARROW_WIDTH * 2;
@@ -93,10 +97,9 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
       className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
       onClick={onClose}
     >
-      {/* Modal content */}
       <div
         className="relative bg-white rounded-lg overflow-hidden"
-        style={{ width: totalWidth, height }}
+        style={{ width: totalWidth, height: height + BOTTOM_PADDING }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Book area */}
@@ -105,59 +108,69 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
           images={magazine.images}
           orientation={magazine.orientation}
           pageDimensions={magazine.page}
-          displayHeight={height}
+          displayHeight={height - TOP_PADDING}
           singlePage={effectiveSinglePage}
+          onBookReady={setFlipRef}
         />
 
-        {/* Close button — absolute top-right corner */}
+        {/* Close button — top right */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 bg-[#7C5A3A] text-white p-2 rounded-full hover:bg-[#6A4C31] transition-all z-10 shadow-md"
+          className={`absolute top-3 right-3 bg-[#7C5A3A] text-white rounded-full hover:bg-[#6A4C31] transition-all z-20 shadow-md ${isMobile ? 'p-1.5' : 'p-2'}`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-      </div>
 
-      {/* Toggle — desktop only, fixed to bottom center of screen */}
-      {!isMobile && (
-        <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg rounded-full px-4 py-2 z-[60]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span
-            className={`text-sm font-medium transition-colors select-none ${singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'
-              }`}
+        {/* Bottom overlay bar — prev/next + toggle */}
+        <div className="absolute bottom-0 left-0 right-0 h-14 flex items-center justify-between px-4 z-20">
+          {/* Prev button */}
+          <button
+            onClick={() => flipRef?.pageFlip()?.flipPrev()}
+            className={`bg-[#7C5A3A] text-white rounded-full hover:bg-[#6A4C31] transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
           >
-            Single
-          </span>
+            <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
 
-          <ToggleButton
-            value={!singlePage}
-            onToggle={() => setSinglePage((prev) => !prev)}
-            colors={{
-              activeThumb: { base: '#ffffff' },
-              inactiveThumb: { base: '#ffffff' },
-              active: {
-                base: '#7C5A3A',
-                hover: '#6A4C31',
-              },
-              inactive: {
-                base: '#d1d5db',
-                hover: '#9ca3af',
-              },
-            }}
-          />
+          {/* Toggle — desktop only */}
+          {!isMobile && (
+            <div
+              className="flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-200 shadow rounded-full px-4 py-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className={`text-sm font-medium select-none transition-colors ${singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'}`}>
+                Single
+              </span>
+              <ToggleButton
+                value={!singlePage}
+                onToggle={() => setSinglePage((prev) => !prev)}
+                colors={{
+                  activeThumb: { base: '#ffffff' },
+                  inactiveThumb: { base: '#ffffff' },
+                  active: { base: '#7C5A3A', hover: '#6A4C31' },
+                  inactive: { base: '#d1d5db', hover: '#9ca3af' },
+                }}
+              />
+              <span className={`text-sm font-medium select-none transition-colors ${!singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'}`}>
+                Double
+              </span>
+            </div>
+          )}
 
-          <span
-            className={`text-sm font-medium transition-colors select-none ${!singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'
-              }`}
+          {/* Next button */}
+          <button
+            onClick={() => flipRef?.pageFlip()?.flipNext()}
+            className={`bg-[#7C5A3A] text-white rounded-full hover:bg-[#6A4C31] transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
           >
-            Double
-          </span>
+            <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
