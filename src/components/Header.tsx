@@ -5,8 +5,11 @@ const Header = () => {
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
+    const header = document.querySelector('header');
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const headerHeight = header?.offsetHeight ?? 57;
+      const top = element.getBoundingClientRect().top + window.scrollY - headerHeight;
+      window.scrollTo({ top, behavior: 'smooth' });
     }
     setIsMenuOpen(false);
   };

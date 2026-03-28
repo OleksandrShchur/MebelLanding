@@ -31,14 +31,13 @@ const HeroCarousel = () => {
   };
 
   return (
-    <section id="hero" className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden">
+    <section id="hero" className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden scroll-mt-14">
       <div className="relative h-full">
         {heroImages.map((image, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? 'opacity-100' : 'opacity-0'
+              }`}
           >
             <img
               src={image}
