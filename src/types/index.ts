@@ -43,6 +43,5 @@ export type Category =
 export interface CategoryData {
   id: Category;
   name: string;
-  description: string;
   imageId: string;
 }
