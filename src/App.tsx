@@ -7,6 +7,7 @@ import MagazineModal from './components/MagazineModal';
 import Footer from './components/Footer';
 import { useGallery } from './hooks/useGallery';
 import type { Category, Magazine } from './types';
+import { categories } from './data/categories';
 
 function App() {
   const { data, loading, error } = useGallery();
@@ -58,21 +59,14 @@ function App() {
 
       {data && (
         <>
-          <CategorySection
-            category="wardrobes"
-            magazines={data.wardrobes}
-            onMagazineClick={handleMagazineClick}
-          />
-          <CategorySection
-            category="sofas"
-            magazines={data.sofas}
-            onMagazineClick={handleMagazineClick}
-          />
-          <CategorySection
-            category="kitchens"
-            magazines={data.kitchens}
-            onMagazineClick={handleMagazineClick}
-          />
+          {categories.map((category) => (
+            <CategorySection
+              key={category.id}
+              category={category.id}
+              magazines={data[category.id]}
+              onMagazineClick={handleMagazineClick}
+            />
+          ))}
         </>
       )}
 
@@ -87,12 +81,12 @@ function App() {
   );
 }
 
-function findMagazineByCategoryAndId(data: { wardrobes: Magazine[]; sofas: Magazine[]; kitchens: Magazine[] }, category: Category, id: number): Magazine | null {
+function findMagazineByCategoryAndId(data: Record<Category, Magazine[]>, category: Category, id: number): Magazine | null {
   return data[category].find(magazine => magazine.id === id) || null;
 }
 
 function isValidCategory(category: string): category is Category {
-  return ['wardrobes', 'sofas', 'kitchens'].includes(category);
+  return categories.some(cat => cat.id === category);
 }
 
 function isValidId(id: string): boolean {
