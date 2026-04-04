@@ -23,7 +23,9 @@ const CategoriesGrid = ({ onCategoryClick }: CategoriesGridProps) => {
                 className="w-full h-48 object-contain"
               />
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2 text-[#2F2A25]">{category.name}</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#2F2A25] text-center">
+                  {category.name}
+                </h3>
               </div>
             </div>
           ))}
