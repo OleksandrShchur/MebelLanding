@@ -5,6 +5,7 @@ import CategoriesGrid from './components/CategoriesGrid';
 import CategorySection from './components/CategorySection';
 import MagazineModal from './components/MagazineModal';
 import Footer from './components/Footer';
+import ScrollToTopButton from './components/ScrollToTopButton';
 import { useGallery } from './hooks/useGallery';
 import type { Category, Magazine } from './types';
 import { categories } from './data/categories';
@@ -71,6 +72,8 @@ function App() {
       )}
 
       <Footer />
+
+      <ScrollToTopButton />
 
       <MagazineModal
         magazine={selectedMagazine}
