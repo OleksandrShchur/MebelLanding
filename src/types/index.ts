@@ -8,9 +8,17 @@ export interface Magazine {
 }
 
 export interface GalleryData {
-  wardrobes: Magazine[];
-  sofas: Magazine[];
   kitchens: Magazine[];
+  tablesAndChairs: Magazine[];
+  wardrobes: Magazine[];
+  beds: Magazine[];
+  mattresses: Magazine[];
+  kidsFurniture: Magazine[];
+  dressersAndSideboards: Magazine[];
+  livingRoom: Magazine[];
+  office: Magazine[];
+  sofas: Magazine[];
+  bathroom: Magazine[];
 }
 
 export interface PageDimensions {
@@ -19,4 +27,21 @@ export interface PageDimensions {
   spread: 'single' | 'double';
 }
 
-export type Category = 'wardrobes' | 'sofas' | 'kitchens';
+export type Category = 
+  | 'kitchens'
+  | 'tablesAndChairs'
+  | 'wardrobes'
+  | 'beds'
+  | 'mattresses'
+  | 'kidsFurniture'
+  | 'dressersAndSideboards'
+  | 'livingRoom'
+  | 'office'
+  | 'sofas'
+  | 'bathroom';
+
+export interface CategoryData {
+  id: Category;
+  name: string;
+  imageId: string;
+}
