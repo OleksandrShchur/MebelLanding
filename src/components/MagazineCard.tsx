@@ -17,9 +17,10 @@ const MagazineCard = ({ magazine, onClick }: MagazineCardProps) => {
         className="w-full h-64 object-cover"
         loading="lazy"
       />
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-2 text-[#2F2A25]">{magazine.name}</h3>
-        <p className="text-[#5B544E] text-sm mb-2">{magazine.description}</p>
+      <div className="p-4 text-center">
+        <h3 className="text-lg font-semibold mb-2 text-[#2F2A25]">
+          {magazine.name}
+        </h3>
       </div>
     </div>
   );
