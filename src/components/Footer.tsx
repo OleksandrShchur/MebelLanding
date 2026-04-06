@@ -1,8 +1,11 @@
+import { Phone, Mail, MapPin } from "lucide-react";
+import { FaFacebook, FaWhatsapp, FaViber } from "react-icons/fa";
+
 const Footer = () => {
   return (
     <footer id="footer" className="bg-white py-8 border-t border-[#E6E1DA]">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-32 justify-items-center md:justify-items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16 lg:gap-32 justify-items-center md:justify-items-start">
           {/* Column 1 */}
           <div className="w-full">
             <h3 className="text-xl font-bold mb-4 text-[#2F2A25]">Магазин Mebel</h3>
@@ -15,9 +18,18 @@ const Footer = () => {
           {/* Column 2 — Contact + Map */}
           <div className="w-full">
             <h3 className="text-xl font-bold mb-4 text-[#2F2A25]">Зв'яжіться з нами</h3>
-            <p className="text-[#5B544E] mb-2">Номер: +1 (555) 123-4567</p>
-            <p className="text-[#5B544E] mb-2">Пошта: info@mebelstore.com</p>
-            <p className="text-[#5B544E] mb-3">Адреса: 123 Магазин Меблів</p>
+            <div className="flex items-center gap-2 text-[#5B544E] mb-2">
+              <Phone size={16} className="text-[#8A6A50] shrink-0" />
+              <span>+1 (555) 123-4567</span>
+            </div>
+            <div className="flex items-center gap-2 text-[#5B544E] mb-2">
+              <Mail size={16} className="text-[#8A6A50] shrink-0" />
+              <span>info@mebelstore.com</span>
+            </div>
+            <div className="flex items-center gap-2 text-[#5B544E] mb-3">
+              <MapPin size={16} className="text-[#8A6A50] shrink-0" />
+              <span>123 Магазин Меблів</span>
+            </div>
             {/* Mini map box */}
             <div className="rounded-lg overflow-hidden border border-[#E6E1DA] shadow-sm w-full h-36">
               <iframe
@@ -36,10 +48,19 @@ const Footer = () => {
           {/* Column 3 */}
           <div className="w-full">
             <h3 className="text-xl font-bold mb-4 text-[#2F2A25]">Соціальні мережі</h3>
-            <div className="flex flex-col space-y-2">
-              <a href="#" className="text-[#5B544E] hover:text-[#2F2A25] transition-colors">Facebook</a>
-              <a href="#" className="text-[#5B544E] hover:text-[#2F2A25] transition-colors">WhatsApp</a>
-              <a href="#" className="text-[#5B544E] hover:text-[#2F2A25] transition-colors">Viber</a>
+            <div className="flex flex-col space-y-3">
+              <a href="#" className="flex items-center gap-2 text-[#5B544E] hover:text-[#2F2A25] transition-colors">
+                <FaFacebook size={18} className="text-[#1877F2]" />
+                <span>Facebook</span>
+              </a>
+              <a href="#" className="flex items-center gap-2 text-[#5B544E] hover:text-[#2F2A25] transition-colors">
+                <FaWhatsapp size={18} className="text-[#25D366]" />
+                <span>WhatsApp</span>
+              </a>
+              <a href="#" className="flex items-center gap-2 text-[#5B544E] hover:text-[#2F2A25] transition-colors">
+                <FaViber size={18} className="text-[#7360F2]" />
+                <span>Viber</span>
+              </a>
             </div>
           </div>
         </div>
