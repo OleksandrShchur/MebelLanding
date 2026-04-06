@@ -3,7 +3,6 @@
     {
       "id": 1,
       "name": "Modern Wardrobe",
-      "description": "A sleek and contemporary wardrobe with ample storage.",
       "orientation": "portrait",
       "page": {
         "width": 3508,
@@ -22,7 +21,6 @@
     {
       "id": 2,
       "name": "Classic Wardrobe",
-      "description": "Timeless design with elegant finishes.",
       "orientation": "landscape",
       "page": {
         "width": 2481,
@@ -47,7 +45,6 @@
     {
       "id": 1,
       "name": "Modern Sofa",
-      "description": "A sleek and contemporary sofa with clean lines.",
       "orientation": "landscape",
       "page": {
         "width": 1595,
@@ -63,7 +60,6 @@
     {
       "id": 2,
       "name": "Comfort Sofa",
-      "description": "Soft and inviting sofa for ultimate relaxation.",
       "orientation": "landscape",
       "page": {
         "width": 595,
@@ -79,34 +75,73 @@
   "kitchens": [
     {
       "id": 1,
-      "name": "Modern Kitchen",
-      "description": "Contemporary kitchen design with functional layout.",
+      "name": "Каталог Віко",
       "orientation": "portrait",
       "page": {
-        "width": 595,
-        "height": 842,
+        "width": 2528,
+        "height": 2528,
         "spread": "double"
       },
       "images": [
-        "/images/img_1.jpg",
-        "/images/img_2.jpg",
-        "/images/img_3.jpg"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Rustic Kitchen",
-      "description": "Warm and inviting kitchen with rustic charm.",
-      "orientation": "landscape",
-      "page": {
-        "width": 595,
-        "height": 842,
-        "spread": "double"
-      },
-      "images": [
-        "/images/img_1.jpg",
-        "/images/img_2.jpg"
+        "/images/viko_catalog/page-0001.jpg",
+        "/images/viko_catalog/page-0002.jpg",
+        "/images/viko_catalog/page-0003.jpg",
+        "/images/viko_catalog/page-0004.jpg",
+        "/images/viko_catalog/page-0005.jpg",
+        "/images/viko_catalog/page-0006.jpg",
+        "/images/viko_catalog/page-0007.jpg",
+        "/images/viko_catalog/page-0008.jpg",
+        "/images/viko_catalog/page-0009.jpg",
+        "/images/viko_catalog/page-0010.jpg",
+        "/images/viko_catalog/page-0011.jpg",
+        "/images/viko_catalog/page-0012.jpg",
+        "/images/viko_catalog/page-0013.jpg",
+        "/images/viko_catalog/page-0014.jpg",
+        "/images/viko_catalog/page-0015.jpg",
+        "/images/viko_catalog/page-0016.jpg",
+        "/images/viko_catalog/page-0017.jpg",
+        "/images/viko_catalog/page-0018.jpg",
+        "/images/viko_catalog/page-0019.jpg",
+        "/images/viko_catalog/page-0020.jpg",
+        "/images/viko_catalog/page-0021.jpg",
+        "/images/viko_catalog/page-0022.jpg",
+        "/images/viko_catalog/page-0023.jpg",
+        "/images/viko_catalog/page-0024.jpg",
+        "/images/viko_catalog/page-0025.jpg",
+        "/images/viko_catalog/page-0026.jpg",
+        "/images/viko_catalog/page-0027.jpg",
+        "/images/viko_catalog/page-0028.jpg",
+        "/images/viko_catalog/page-0029.jpg",
+        "/images/viko_catalog/page-0030.jpg",
+        "/images/viko_catalog/page-0031.jpg",
+        "/images/viko_catalog/page-0032.jpg",
+        "/images/viko_catalog/page-0033.jpg",
+        "/images/viko_catalog/page-0034.jpg",
+        "/images/viko_catalog/page-0035.jpg",
+        "/images/viko_catalog/page-0036.jpg",
+        "/images/viko_catalog/page-0037.jpg",
+        "/images/viko_catalog/page-0038.jpg",
+        "/images/viko_catalog/page-0039.jpg",
+        "/images/viko_catalog/page-0040.jpg",
+        "/images/viko_catalog/page-0041.jpg",
+        "/images/viko_catalog/page-0042.jpg",
+        "/images/viko_catalog/page-0043.jpg",
+        "/images/viko_catalog/page-0044.jpg",
+        "/images/viko_catalog/page-0045.jpg",
+        "/images/viko_catalog/page-0046.jpg",
+        "/images/viko_catalog/page-0047.jpg",
+        "/images/viko_catalog/page-0048.jpg",
+        "/images/viko_catalog/page-0049.jpg",
+        "/images/viko_catalog/page-0050.jpg"
       ]
     }
-  ]
+  ],
+  "tablesAndChairs": [],
+  "beds": [],
+  "mattresses": [],
+  "kidsFurniture": [],
+  "dressersAndSideboards": [],
+  "livingRoom": [],
+  "office": [],
+  "bathroom": []
 }
