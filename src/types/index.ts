@@ -1,7 +1,6 @@
 export interface Magazine {
   id: number;
   name: string;
-  description: string;
   orientation: 'portrait' | 'landscape';
   page: PageDimensions;
   images: string[];

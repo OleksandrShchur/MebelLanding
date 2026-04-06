@@ -1,22 +1,19 @@
 import { useState, useEffect } from 'react';
 
 const heroImages = [
-  `${import.meta.env.BASE_URL}/images/img_1.jpg`,
-  `${import.meta.env.BASE_URL}/images/img_2.jpg`,
-  `${import.meta.env.BASE_URL}/images/img_3.jpg`,
-  `${import.meta.env.BASE_URL}/images/img_11.jpg`
+  `${import.meta.env.BASE_URL}/images/top/1.jpg`
 ];
 
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000); // Auto slide every 5 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+  //   }, 5000); // Auto slide every 5 seconds
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
