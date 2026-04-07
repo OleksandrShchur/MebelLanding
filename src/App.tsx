@@ -39,7 +39,7 @@ function App() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F7F5F2]">
-        <div className="text-xl text-[#5B544E]">Завантаження...</div>
+        <div className="text-lg md:text-xl text-[#5B544E]">Завантаження...</div>
       </div>
     );
   }
@@ -47,7 +47,7 @@ function App() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F7F5F2]">
-        <div className="text-xl text-[#7C5A3A]">Помилка: {error}</div>
+        <div className="text-lg md:text-xl text-[#7C5A3A]">Помилка: {error}</div>
       </div>
     );
   }
