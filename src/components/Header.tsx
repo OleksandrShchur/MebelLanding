@@ -90,6 +90,12 @@ const Header = () => {
   }, [location.pathname, pendingSection, headerHeight]);
 
   const handleNavClick = (sectionId: string) => {
+    // For footer, scroll directly on any page since footer is present everywhere
+    if (sectionId === 'footer') {
+      scrollToSection(sectionId);
+      return;
+    }
+
     if (location.pathname !== '/') {
       setPendingSection(sectionId);
       navigate('/');
