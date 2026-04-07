@@ -31,7 +31,7 @@ const navItems = [
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const [headerHeight, setHeaderHeight] = useState(57);
+  const [headerHeight, setHeaderHeight] = useState(50);
 
   useEffect(() => {
     if (headerRef.current) {
@@ -91,9 +91,9 @@ const Header = () => {
               <button
                 key={id}
                 onClick={() => scrollToSection(id)}
-                className="group flex items-center gap-2 px-3 py-2 rounded-lg text-[#5B544E] hover:text-[#2F2A25] hover:bg-[#F5F0EB] transition-all duration-200"
+                className="group flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent text-[#5B544E] hover:text-[#2F2A25] hover:bg-[#F5F0EB] transition-all duration-200"
               >
-                <span className="text-[#7D5C3C] group-hover:text-[#5B3E28] transition-colors">
+                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-[#5B3E28]/15 group-hover:bg-[#5B3E28]/20 transition-colors text-[#F7F5F2]">
                   <Icon />
                 </span>
                 <span className="text-sm font-medium">{label}</span>
