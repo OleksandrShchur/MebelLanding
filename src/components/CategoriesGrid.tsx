@@ -9,7 +9,7 @@ const CategoriesGrid = ({ onCategoryClick }: CategoriesGridProps) => {
   return (
     <section id="categories" className="py-16 bg-[#F7F5F2]">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-[#2F2A25]">Наші категорії</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-[#2F2A25]">Наші категорії</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8">
           {categories.map((category) => (
             <div
@@ -23,7 +23,7 @@ const CategoriesGrid = ({ onCategoryClick }: CategoriesGridProps) => {
                 className="w-full h-48 object-contain"
               />
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2 text-[#2F2A25] text-center">
+                <h3 className="text-lg md:text-xl font-semibold mb-2 text-[#2F2A25] text-center">
                   {category.name}
                 </h3>
               </div>
