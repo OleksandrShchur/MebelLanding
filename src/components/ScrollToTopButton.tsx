@@ -12,6 +12,9 @@ const ScrollToTopButton = () => {
       }
     };
 
+    // Check visibility immediately on mount
+    toggleVisibility();
+
     window.addEventListener('scroll', toggleVisibility);
 
     return () => window.removeEventListener('scroll', toggleVisibility);

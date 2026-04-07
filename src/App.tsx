@@ -8,6 +8,7 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/catalog/:category/:magazineId" element={<Home />} />
         <Route path="/terms" element={<TermsOfUsePage />} />
       </Routes>
     </Layout>
