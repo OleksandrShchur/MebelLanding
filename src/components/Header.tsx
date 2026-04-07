@@ -23,6 +23,31 @@ const ContactIcon = () => (
   </svg>
 );
 
+const SofaIcon = () => (
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 84 84"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px', flexShrink: 0 }}
+  >
+    {/* Sofa back */}
+    <rect x="12" y="20" width="60" height="22" rx="5" fill="#7D5030" />
+    {/* Seat */}
+    <rect x="8" y="40" width="68" height="24" rx="5" fill="#6B4226" />
+    {/* Seat cushion shine */}
+    <rect x="14" y="42" width="56" height="10" rx="3" fill="#8B5E3C" opacity="0.45" />
+    {/* Left armrest */}
+    <rect x="2" y="30" width="12" height="30" rx="4" fill="#5A3318" />
+    {/* Right armrest */}
+    <rect x="70" y="30" width="12" height="30" rx="4" fill="#5A3318" />
+    {/* Left leg */}
+    <rect x="10" y="62" width="6" height="10" rx="2" fill="#3E2208" />
+    {/* Right leg */}
+    <rect x="68" y="62" width="6" height="10" rx="2" fill="#3E2208" />
+  </svg>
+);
+
 const navItems = [
   { id: 'hero', label: 'Головна', Icon: HomeIcon },
   { id: 'categories', label: 'Каталоги', Icon: CatalogIcon },
@@ -109,7 +134,10 @@ const Header = () => {
         className="sticky top-0 z-50 bg-white shadow-md border-b border-[#E6E1DA]"
       >
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-          <h1 className="text-xl md:text-2xl font-bold text-[#2F2A25]">Магазин Mebel</h1>
+          <h1 className="flex items-center text-xl md:text-2xl font-bold text-[#2F2A25]">
+            <SofaIcon />
+            Магазин Mebel
+          </h1>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-1">
