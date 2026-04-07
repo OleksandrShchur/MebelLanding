@@ -118,7 +118,6 @@ const Header = () => {
         <div
           className="md:hidden fixed inset-x-0 z-40 bg-white shadow-xl"
           style={{
-            top: `${headerHeight}px`,
             transition: 'opacity 0.25s ease, transform 0.25s ease',
             opacity: isMenuOpen ? 1 : 0,
             transform: isMenuOpen ? 'translateY(0)' : 'translateY(-6px)',
