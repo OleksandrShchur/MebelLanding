@@ -41,37 +41,7 @@
       ]
     }
   ],
-  "sofas": [
-    {
-      "id": 1,
-      "name": "Modern Sofa",
-      "orientation": "landscape",
-      "page": {
-        "width": 1595,
-        "height": 1842,
-        "spread": "double"
-      },
-      "images": [
-        "/images/img_1.jpg",
-        "/images/img_2.jpg",
-        "/images/img_3.jpg"
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Comfort Sofa",
-      "orientation": "landscape",
-      "page": {
-        "width": 595,
-        "height": 842,
-        "spread": "double"
-      },
-      "images": [
-        "/images/img_1.jpg",
-        "/images/img_2.jpg"
-      ]
-    }
-  ],
+  "sofas": [],
   "kitchens": [
     {
       "id": 1,

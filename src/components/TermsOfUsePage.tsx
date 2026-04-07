@@ -1,4 +1,10 @@
+import { useEffect } from 'react';
+
 const TermsOfUsePage = () => {
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
+
     return (
         <div className="min-h-screen bg-[#F8F5F0] text-[#2F2A25]">
             <section className="border-b border-[#E7DED2] bg-gradient-to-b from-[#F6F1EA] to-[#F8F5F0]">
