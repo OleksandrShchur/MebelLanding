@@ -15,7 +15,7 @@ const CategoriesGrid = ({ onCategoryClick }: CategoriesGridProps) => {
             <div
               key={category.id}
               onClick={() => onCategoryClick(category.id)}
-              className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border border-[#E6E1DA]"
+              className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:-translate-y-3 hover:shadow-lg active:scale-[0.8] transition duration-300 ease-out transform border border-[#E6E1DA]"
             >
               <img
                 src={`${import.meta.env.BASE_URL}images/categories/${category.imageId}`}

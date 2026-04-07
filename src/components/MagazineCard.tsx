@@ -9,7 +9,7 @@ const MagazineCard = ({ magazine, onClick }: MagazineCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border border-[#E6E1DA]"
+      className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-lg active:scale-[0.99] transition duration-300 ease-out transform border border-[#E6E1DA]"
     >
       <img
         src={`${import.meta.env.BASE_URL}${magazine.images[0]}`}
