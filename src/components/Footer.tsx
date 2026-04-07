@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin } from "lucide-react";
 import { FaFacebook, FaWhatsapp, FaViber } from "react-icons/fa";
 
@@ -68,6 +69,9 @@ const Footer = () => {
         <div className="border-t border-[#E6E1DA] mt-8 pt-8 text-center">
           <p className="text-sm text-[#8A827A]">
             © {new Date().getFullYear()} Магазин Mebel. Усі права захищені.
+            <Link to="/terms" className="ml-3 text-sm text-[#8A827A] hover:text-[#2F2A25] transition-colors">
+              Умови використання
+            </Link>
           </p>
         </div>
       </div>
