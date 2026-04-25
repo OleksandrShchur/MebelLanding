@@ -4,6 +4,7 @@ import HTMLFlipBook from 'react-pageflip';
 import { useSearchParams } from 'react-router-dom';
 import type { PageDimensions } from '../types';
 import { assetUrl } from '../utils/assets';
+import LoadingSpinner from './LoadingSpinner';
 
 export interface FlipBookRef {
   pageFlip(): {
@@ -101,7 +102,9 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
       <div
         className="relative w-full h-full"
         style={{ minHeight: pageHeight }}
-      />
+      >
+        <LoadingSpinner overlay label="Завантаження..." />
+      </div>
     );
   }
 

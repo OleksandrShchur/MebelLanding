@@ -1,9 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import LoadingSpinner from './LoadingSpinner';
 
 const TermsOfUsePage = () => {
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        const timeout = setTimeout(() => setLoading(false), 250);
+        return () => clearTimeout(timeout);
     }, []);
+
+    if (loading) {
+        return <LoadingSpinner fullscreen label="Завантаження..." />;
+    }
 
     return (
         <div className="min-h-screen bg-[#F8F5F0] text-[#2F2A25]">
