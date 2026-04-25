@@ -3,8 +3,9 @@ import { useMediaQuery } from '../hooks/useMediaQuery';
 import HTMLFlipBook from 'react-pageflip';
 import { useSearchParams } from 'react-router-dom';
 import type { PageDimensions } from '../types';
+import { assetUrl } from '../utils/assets';
 
-interface FlipBookRef {
+export interface FlipBookRef {
   pageFlip(): {
     flipNext(): void;
     flipPrev(): void;
@@ -65,7 +66,7 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
   const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions, resolvedHeight);
 
   const handleFlip = useCallback(
-    (e: any) => {
+    (e: { data: unknown }) => {
       const newPage = Number(e.data);
       if (newPage !== currentPage) {
         setCurrentPage(newPage);
@@ -76,7 +77,8 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
   );
 
   useEffect(() => {
-    setReady(true);
+    const timeout = setTimeout(() => setReady(true), 0);
+    return () => clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
@@ -122,7 +124,7 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
   const pages = images.map((image, index) => (
     <Page
       key={index}
-      src={`${import.meta.env.BASE_URL}${image}`}
+      src={assetUrl(image)}
       alt={`Page ${index + 1}`}
       width={pageWidth}
       height={pageHeight}

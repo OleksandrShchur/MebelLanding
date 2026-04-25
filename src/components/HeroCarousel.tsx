@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { assetUrl } from '../utils/assets';
 
 const heroImages = [
-  `${import.meta.env.BASE_URL}/images/top/1.jpg`
+  assetUrl('images/top/1.jpg')
 ];
 
 const HeroCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentIndex = 0;
 
   // useEffect(() => {
   //   const interval = setInterval(() => {
@@ -14,18 +14,6 @@ const HeroCarousel = () => {
 
   //   return () => clearInterval(interval);
   // }, []);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + heroImages.length) % heroImages.length);
-  };
 
   return (
     <section id="hero" className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden scroll-mt-14">
