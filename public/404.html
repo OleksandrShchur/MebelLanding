@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting...</title>
+    <script>
+      (function redirectToSpa(location) {
+        var repoPathSegments = 1;
+        var pathSegments = location.pathname.split('/');
+        var basePath = pathSegments.slice(0, repoPathSegments + 1).join('/') + '/';
+        var routePath = pathSegments.slice(repoPathSegments + 1).join('/');
+        var query = location.search
+          ? '&' + location.search.slice(1).replace(/&/g, '~and~')
+          : '';
+
+        location.replace(
+          location.protocol + '//' +
+          location.hostname +
+          (location.port ? ':' + location.port : '') +
+          basePath +
+          '?' +
+          '/' + routePath.replace(/&/g, '~and~') +
+          query +
+          location.hash
+        );
+      })(window.location);
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,4 +1,5 @@
 import type { Magazine } from "../types";
+import { assetUrl } from "../utils/assets";
 
 interface MagazineCardProps {
   magazine: Magazine;
@@ -12,7 +13,7 @@ const MagazineCard = ({ magazine, onClick }: MagazineCardProps) => {
       className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-lg active:scale-[0.99] transition duration-300 ease-out transform border border-[#E6E1DA]"
     >
       <img
-        src={`${import.meta.env.BASE_URL}${magazine.images[0]}`}
+        src={assetUrl(magazine.images[0])}
         alt={magazine.name}
         className="w-full h-64 object-cover"
         loading="lazy"

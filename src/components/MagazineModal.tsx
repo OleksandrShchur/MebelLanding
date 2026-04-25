@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Magazine } from '../types';
-import FlipBookViewer from './FlipBookViewer';
+import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import ToggleButton from 'react-toggle-button';
 
@@ -44,7 +44,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const [flipRef, setFlipRef] = useState<any>(null);
+  const [flipRef, setFlipRef] = useState<FlipBookRef | null>(null);
 
   useEffect(() => {
     const handleResize = () =>
@@ -55,7 +55,8 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
   useEffect(() => {
     if (magazine) {
-      setSinglePage(magazine.page.spread === 'single');
+      const timeout = setTimeout(() => setSinglePage(magazine.page.spread === 'single'), 0);
+      return () => clearTimeout(timeout);
     }
   }, [magazine?.id]);
 
