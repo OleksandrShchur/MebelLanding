@@ -3,6 +3,7 @@ import HeroCarousel from './HeroCarousel';
 import CategoriesGrid from './CategoriesGrid';
 import CategorySection from './CategorySection';
 import MagazineModal from './MagazineModal';
+import LoadingSpinner from './LoadingSpinner';
 import { useGallery } from '../hooks/useGallery';
 import type { Category, Magazine } from '../types';
 import { categories } from '../data/categories';
@@ -34,11 +35,7 @@ function Home() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg md:text-xl text-[#5B544E]">Завантаження...</div>
-      </div>
-    );
+    return <LoadingSpinner fullscreen label="Завантаження..." />;
   }
 
   if (error) {

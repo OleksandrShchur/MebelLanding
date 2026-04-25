@@ -3,6 +3,7 @@ import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import ToggleButton from 'react-toggle-button';
+import LoadingSpinner from './LoadingSpinner';
 
 interface MagazineModalProps {
   magazine: Magazine | null;
@@ -45,6 +46,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     height: window.innerHeight,
   });
   const [flipRef, setFlipRef] = useState<FlipBookRef | null>(null);
+  const [bookLoading, setBookLoading] = useState(false);
 
   useEffect(() => {
     const handleResize = () =>
@@ -59,6 +61,16 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
       return () => clearTimeout(timeout);
     }
   }, [magazine?.id]);
+
+  useEffect(() => {
+    if (!isOpen || !magazine) return;
+
+    const timeout = setTimeout(() => {
+      setFlipRef(null);
+      setBookLoading(true);
+    }, 0);
+    return () => clearTimeout(timeout);
+  }, [isOpen, magazine?.id, singlePage, isMobile]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -93,6 +105,11 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     ? Math.min(width, viewport.width - PADDING * 2)
     : width + ARROW_WIDTH * 2;
 
+  const handleBookReady = (ref: FlipBookRef) => {
+    setFlipRef(ref);
+    setBookLoading(false);
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
@@ -111,8 +128,10 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
           pageDimensions={magazine.page}
           displayHeight={height - TOP_PADDING}
           singlePage={effectiveSinglePage}
-          onBookReady={setFlipRef}
+          onBookReady={handleBookReady}
         />
+
+        {bookLoading && <LoadingSpinner overlay label="Завантаження..." />}
 
         {/* Close button — top right */}
         <button
