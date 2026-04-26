@@ -81,7 +81,7 @@ const Header = () => {
     }, 50);
 
     return () => window.clearTimeout(timer);
-  }, [location.pathname, pendingSection, headerHeight]);
+  }, [location.pathname, pendingSection]);
 
   const handleNavClick = (sectionId: string) => {
     // For footer, scroll directly on any page since footer is present everywhere
