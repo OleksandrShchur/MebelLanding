@@ -58,15 +58,9 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [pendingSection, setPendingSection] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
-  const [headerHeight, setHeaderHeight] = useState(50);
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    if (headerRef.current) {
-      setHeaderHeight(headerRef.current.offsetHeight);
-    }
-  }, []);
+  const headerHeight = 50;
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -178,6 +172,7 @@ const Header = () => {
         <div
           className="md:hidden fixed inset-x-0 z-40 bg-white shadow-xl"
           style={{
+            top: `${headerHeight}px`,
             transition: 'opacity 0.25s ease, transform 0.25s ease',
             opacity: isMenuOpen ? 1 : 0,
             transform: isMenuOpen ? 'translateY(0)' : 'translateY(-6px)',
