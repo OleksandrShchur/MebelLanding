@@ -50,22 +50,6 @@ button {
   transition: background-color 0.25s;
 }
 
-@layer base {
-  button:not(.nav-btn) {
-    background-color: var(--color-mebel-olive);
-    color: white;
-  }
-
-  button:not(.nav-btn):hover {
-    background-color: var(--color-mebel-olive-dark);
-  }
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     color: var(--color-mebel-text);

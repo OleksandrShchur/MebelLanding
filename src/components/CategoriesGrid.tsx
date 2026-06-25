@@ -120,21 +120,23 @@ const CategoriesGrid = ({
                 type="button"
                 onClick={() => onSelect(category.id)}
                 disabled={category.disabled}
-                className="group flex min-h-[188px] w-full flex-col rounded-[26px] border border-mebel-border-muted bg-mebel-surface-raised p-3 text-left text-mebel-text-strong shadow-mebel-sm transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:border-mebel-tan hover:shadow-mebel-md active:translate-y-0 active:scale-[0.985] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mebel-olive disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-mebel-sm disabled:active:scale-100 md:min-h-[280px] md:p-4 md:hover:-translate-y-2"
+                className="group w-full text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mebel-olive disabled:cursor-not-allowed disabled:opacity-60"
                 aria-label={`Перейти до категорії ${category.name}`}
               >
-                <div className="flex min-h-[112px] items-center justify-center rounded-[22px] border border-mebel-border-muted bg-gradient-to-b from-mebel-surface-raised to-mebel-cream px-4 py-5 transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02] md:min-h-[176px] md:px-6 md:py-8">
-                  <img
-                    src={category.imageSrc}
-                    alt={category.imageAlt ?? category.name}
-                    className="max-h-24 w-full object-contain opacity-95 transition duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] group-hover:opacity-100 md:max-h-36"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="mt-auto flex min-h-16 items-center justify-center px-2 pb-2 pt-4 text-center md:px-3 md:pb-3 md:pt-5">
-                  <h3 className="text-sm font-semibold leading-snug text-mebel-text-strong md:text-lg">
-                    {category.name}
-                  </h3>
+                <div className="flex min-h-[188px] w-full flex-col rounded-[26px] border border-mebel-border-muted bg-mebel-surface-raised p-3 text-mebel-text-strong shadow-mebel-sm transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:border-mebel-tan group-hover:shadow-mebel-md group-active:translate-y-0 group-active:scale-[0.985] group-disabled:hover:translate-y-0 group-disabled:hover:shadow-mebel-sm group-disabled:active:scale-100 md:min-h-[280px] md:p-4 md:group-hover:-translate-y-2">
+                  <div className="flex min-h-[112px] items-center justify-center rounded-[22px] border border-mebel-border-muted bg-gradient-to-b from-mebel-surface-raised to-mebel-cream px-4 py-5 transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02] md:min-h-[176px] md:px-6 md:py-8">
+                    <img
+                      src={category.imageSrc}
+                      alt={category.imageAlt ?? category.name}
+                      className="max-h-24 w-full object-contain opacity-95 transition duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] group-hover:opacity-100 md:max-h-36"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="mt-auto flex min-h-16 items-center justify-center px-2 pb-2 pt-4 text-center md:px-3 md:pb-3 md:pt-5">
+                    <h3 className="text-sm font-semibold leading-snug text-mebel-text-strong md:text-lg">
+                      {category.name}
+                    </h3>
+                  </div>
                 </div>
               </button>
             </motion.div>
