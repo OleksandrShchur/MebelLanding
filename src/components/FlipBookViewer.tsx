@@ -4,7 +4,6 @@ import HTMLFlipBook from 'react-pageflip';
 import { useSearchParams } from 'react-router-dom';
 import type { PageDimensions } from '../types';
 import { assetUrl } from '../utils/assets';
-import LoadingSpinner from './LoadingSpinner';
 
 export interface FlipBookRef {
   pageFlip(): {
@@ -22,6 +21,8 @@ interface FlipBookViewerProps {
   displayHeight?: number;
   singlePage: boolean;
   onBookReady?: (ref: FlipBookRef) => void;
+  onReadyChange?: (ready: boolean) => void;
+  onPageChange?: (page: number) => void;
 }
 
 const DEFAULT_DISPLAY_HEIGHT = 600;
@@ -53,7 +54,15 @@ const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, width, height },
   </div>
 ));
 
-const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onBookReady }: FlipBookViewerProps) => {
+const FlipBookViewer = ({
+  images,
+  pageDimensions,
+  displayHeight,
+  singlePage,
+  onBookReady,
+  onReadyChange,
+  onPageChange,
+}: FlipBookViewerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get('page') || '0')
@@ -61,6 +70,7 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
   const [ready, setReady] = useState(false);
 
   const bookRef = useRef<FlipBookRef | null>(null);
+  const pointerStartX = useRef(0);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const resolvedHeight = displayHeight ?? DEFAULT_DISPLAY_HEIGHT;
@@ -71,16 +81,40 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
       const newPage = Number(e.data);
       if (newPage !== currentPage) {
         setCurrentPage(newPage);
+        onPageChange?.(newPage);
         setSearchParams({ page: newPage.toString() }, { replace: true });
       }
     },
-    [currentPage, setSearchParams]
+    [currentPage, onPageChange, setSearchParams]
   );
 
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setReady(true), 0);
-    return () => window.clearTimeout(timeout);
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    pointerStartX.current = e.clientX;
+    if (e.pointerType === 'touch') {
+      e.preventDefault();
+    }
   }, []);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    const delta = e.clientX - pointerStartX.current;
+    const pageFlip = bookRef.current?.pageFlip();
+    if (!pageFlip) return;
+
+    if (delta > 60) {
+      pageFlip.flipNext();
+    } else if (delta < -60) {
+      pageFlip.flipPrev();
+    }
+  }, []);
+
+  useEffect(() => {
+    onReadyChange?.(false);
+    const timeout = window.setTimeout(() => {
+      setReady(true);
+      onReadyChange?.(true);
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [onReadyChange]);
 
   useEffect(() => {
     if (!ready) return;
@@ -96,17 +130,6 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
     }, 300);
     return () => window.clearTimeout(timeout);
   }, [ready, currentPage, onBookReady]);
-
-  if (!ready) {
-    return (
-      <div
-        className="relative w-full h-full"
-        style={{ minHeight: pageHeight }}
-      >
-        <LoadingSpinner overlay label="Завантаження..." />
-      </div>
-    );
-  }
 
   const commonProps = {
     onFlip: handleFlip,
@@ -134,8 +157,23 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
     />
   ));
 
+  if (!ready) {
+    return (
+      <div
+        className="relative w-full h-full"
+        style={{ minHeight: pageHeight }}
+        aria-hidden="true"
+      />
+    );
+  }
+
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div
+      className="w-full h-full flex items-center justify-center touch-pan-y"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onTouchStart={(e) => e.preventDefault()}
+    >
       {singlePage && !isMobile && (
         <HTMLFlipBook
           ref={bookRef}

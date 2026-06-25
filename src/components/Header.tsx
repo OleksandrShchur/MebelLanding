@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const HomeIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -31,19 +33,12 @@ const SofaIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
     style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px', flexShrink: 0 }}
   >
-    {/* Sofa back */}
     <rect x="12" y="20" width="60" height="22" rx="5" fill="#7D5030" />
-    {/* Seat */}
     <rect x="8" y="40" width="68" height="24" rx="5" fill="#6B4226" />
-    {/* Seat cushion shine */}
     <rect x="14" y="42" width="56" height="10" rx="3" fill="#8B5E3C" opacity="0.45" />
-    {/* Left armrest */}
     <rect x="2" y="30" width="12" height="30" rx="4" fill="#5A3318" />
-    {/* Right armrest */}
     <rect x="70" y="30" width="12" height="30" rx="4" fill="#5A3318" />
-    {/* Left leg */}
     <rect x="10" y="62" width="6" height="10" rx="2" fill="#3E2208" />
-    {/* Right leg */}
     <rect x="68" y="62" width="6" height="10" rx="2" fill="#3E2208" />
   </svg>
 );
@@ -54,19 +49,44 @@ const navItems = [
   { id: 'footer', label: 'Контакти', Icon: ContactIcon },
 ];
 
+const menuContainer = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.04 },
+  },
+};
+
+const menuItem = {
+  hidden: { opacity: 0, x: -12 },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [pendingSection, setPendingSection] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const prefersReducedMotion = useReducedMotion();
   const headerHeight = 50;
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       const top = element.getBoundingClientRect().top + window.scrollY - headerHeight;
-      window.scrollTo({ top, behavior: 'smooth' });
+      window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       setPendingSection(null);
     }
     setIsMenuOpen(false);
@@ -84,7 +104,6 @@ const Header = () => {
   }, [location.pathname, pendingSection]);
 
   const handleNavClick = (sectionId: string) => {
-    // For footer, scroll directly on any page since footer is present everywhere
     if (sectionId === 'footer') {
       scrollToSection(sectionId);
       return;
@@ -99,22 +118,18 @@ const Header = () => {
     scrollToSection(sectionId);
   };
 
+  const menuPanelTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
+
+  const reducedMenuItem = {
+    hidden: { opacity: 1, x: 0 },
+    show: { opacity: 1, x: 0, transition: { duration: 0 } },
+  };
+
   return (
     <>
       <style>{`
-        @keyframes menuItemIn {
-          from { opacity: 0; transform: translateX(-12px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-        .menu-item {
-          animation: menuItemIn 0.25s ease forwards;
-          opacity: 0;
-        }
-        .menu-item:nth-child(1) { animation-delay: 0.05s; }
-        .menu-item:nth-child(2) { animation-delay: 0.10s; }
-        .menu-item:nth-child(3) { animation-delay: 0.15s; }
-
-        /* Animated hamburger bars */
         .bar {
           display: block;
           width: 20px;
@@ -131,7 +146,11 @@ const Header = () => {
 
       <header
         ref={headerRef}
-        className="sticky top-0 z-50 bg-white shadow-md border-b border-mebel-border"
+        className={`fixed top-0 z-50 w-full transition-all duration-300 ease-out ${
+          scrolled
+            ? 'bg-white/80 backdrop-blur-md shadow-mebel-sm border-b border-mebel-border'
+            : 'bg-transparent border-b border-transparent'
+        }`}
       >
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <h1 className="flex items-center text-xl md:text-2xl font-bold text-mebel-text-strong">
@@ -139,7 +158,6 @@ const Header = () => {
             Магазин Mebel
           </h1>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-1">
             {navItems.map(({ id, label, Icon }) => (
               <button
@@ -155,10 +173,9 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Hamburger Button — animated 3-line stack */}
           <button
             className="nav-btn md:hidden w-9 h-9 flex flex-col items-center justify-center rounded-lg text-mebel-text hover:text-mebel-text-strong hover:bg-mebel-hover transition-colors"
-            onClick={() => setIsMenuOpen(prev => !prev)}
+            onClick={() => setIsMenuOpen((prev) => !prev)}
             aria-label={isMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
             aria-expanded={isMenuOpen}
           >
@@ -168,56 +185,70 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Overlay Menu */}
-        <div
-          className="md:hidden fixed inset-x-0 z-40 bg-white shadow-xl"
-          style={{
-            top: `${headerHeight}px`,
-            transition: 'opacity 0.25s ease, transform 0.25s ease',
-            opacity: isMenuOpen ? 1 : 0,
-            transform: isMenuOpen ? 'translateY(0)' : 'translateY(-6px)',
-            pointerEvents: isMenuOpen ? 'auto' : 'none',
-          }}
-        >
-          {/* Decorative top accent line */}
-          <div className="h-0.5 bg-gradient-to-r from-mebel-olive via-mebel-warm to-transparent" />
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              key="mobile-menu"
+              className="md:hidden fixed inset-x-0 z-40 overflow-hidden bg-white shadow-xl"
+              style={{ top: `${headerHeight}px` }}
+              initial={prefersReducedMotion ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={prefersReducedMotion ? { height: 'auto', opacity: 0 } : { height: 0, opacity: 0 }}
+              transition={menuPanelTransition}
+            >
+              <div className="h-0.5 bg-gradient-to-r from-mebel-olive via-mebel-warm to-transparent" />
 
-          <div className="px-4 py-4 space-y-2">
-            {isMenuOpen && navItems.map(({ id, label, Icon }) => (
-              <button
-                key={id}
-                onClick={() => handleNavClick(id)}
-                className="nav-btn menu-item group flex items-center gap-3 w-full text-left px-4 py-3.5 rounded-xl bg-mebel-olive text-white font-medium hover:bg-mebel-olive-dark active:scale-[0.98] transition-all duration-150"
+              <motion.div
+                className="px-4 py-4 space-y-2"
+                variants={prefersReducedMotion ? undefined : menuContainer}
+                initial="hidden"
+                animate="show"
               >
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/15 group-hover:bg-white/25 transition-colors shrink-0 text-white">
-                  <Icon />
-                </span>
-                <span className="text-sm tracking-wide">{label}</span>
-                <svg
-                  className="ml-auto w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 18l6-6-6-6" />
-                </svg>
-              </button>
-            ))}
-          </div>
+                {navItems.map(({ id, label, Icon }) => (
+                  <motion.button
+                    key={id}
+                    variants={prefersReducedMotion ? reducedMenuItem : menuItem}
+                    onClick={() => handleNavClick(id)}
+                    className="nav-btn group flex items-center gap-3 w-full text-left px-4 py-3.5 rounded-xl bg-mebel-olive text-white font-medium hover:bg-mebel-olive-dark active:scale-[0.98] transition-all duration-150"
+                  >
+                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/15 group-hover:bg-white/25 transition-colors shrink-0 text-white">
+                      <Icon />
+                    </span>
+                    <span className="text-sm tracking-wide">{label}</span>
+                    <svg
+                      className="ml-auto w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 18l6-6-6-6" />
+                    </svg>
+                  </motion.button>
+                ))}
+              </motion.div>
 
-          <div className="h-2" />
-        </div>
+              <div className="h-2" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Backdrop */}
-        <div
-          className="md:hidden fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px]"
-          style={{
-            top: `${headerHeight}px`,
-            transition: 'opacity 0.25s ease',
-            opacity: isMenuOpen ? 1 : 0,
-            pointerEvents: isMenuOpen ? 'auto' : 'none',
-          }}
-          onClick={() => setIsMenuOpen(false)}
-        />
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              key="mobile-backdrop"
+              className="md:hidden fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px]"
+              style={{ top: `${headerHeight}px` }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={menuPanelTransition}
+              onClick={() => setIsMenuOpen(false)}
+            />
+          )}
+        </AnimatePresence>
       </header>
+
+      <div className="h-[50px]" aria-hidden="true" />
     </>
   );
 };
