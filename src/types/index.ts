@@ -6,27 +6,7 @@ export interface Magazine {
   images: string[];
 }
 
-export interface GalleryData {
-  kitchens: Magazine[];
-  tablesAndChairs: Magazine[];
-  wardrobes: Magazine[];
-  beds: Magazine[];
-  mattresses: Magazine[];
-  kidsFurniture: Magazine[];
-  dressersAndSideboards: Magazine[];
-  livingRoom: Magazine[];
-  office: Magazine[];
-  sofas: Magazine[];
-  bathroom: Magazine[];
-}
-
-export interface PageDimensions {
-  width: number;
-  height: number;
-  spread: 'single' | 'double';
-}
-
-export type Category = 
+export type Category =
   | 'kitchens'
   | 'tablesAndChairs'
   | 'wardrobes'
@@ -39,8 +19,34 @@ export type Category =
   | 'sofas'
   | 'bathroom';
 
+export type GalleryData = Record<Category, Magazine[]>;
+
+export interface PageDimensions {
+  width: number;
+  height: number;
+  spread: 'single' | 'double';
+}
+
 export interface CategoryData {
   id: Category;
   name: string;
   imageId: string;
+}
+
+export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
+
+export interface CategoryItem {
+  id: Category;
+  name: string;
+  imageSrc: string;
+  imageAlt?: string;
+  disabled?: boolean;
+}
+
+export interface CategorySectionViewModel {
+  category: Category;
+  title: string;
+  magazines: Magazine[];
+  isEmpty: boolean;
+  missing: boolean;
 }

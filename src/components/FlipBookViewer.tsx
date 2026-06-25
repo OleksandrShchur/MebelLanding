@@ -78,14 +78,14 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
   );
 
   useEffect(() => {
-    const timeout = setTimeout(() => setReady(true), 0);
-    return () => clearTimeout(timeout);
+    const timeout = window.setTimeout(() => setReady(true), 0);
+    return () => window.clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
     if (!ready) return;
 
-    const timeout = setTimeout(() => {
+    const timeout = window.setTimeout(() => {
       const pageFlip = bookRef.current?.pageFlip();
       if (pageFlip && currentPage > 0) {
         pageFlip.turnToPage(currentPage);
@@ -94,8 +94,8 @@ const FlipBookViewer = ({ images, pageDimensions, displayHeight, singlePage, onB
         onBookReady?.(bookRef.current);
       }
     }, 300);
-    return () => clearTimeout(timeout);
-  }, [ready]);
+    return () => window.clearTimeout(timeout);
+  }, [ready, currentPage, onBookReady]);
 
   if (!ready) {
     return (

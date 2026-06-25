@@ -41,10 +41,10 @@ function getModalDimensions(
 const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [singlePage, setSinglePage] = useState(false);
-  const [viewport, setViewport] = useState({
+  const [viewport, setViewport] = useState(() => ({
     width: window.innerWidth,
     height: window.innerHeight,
-  });
+  }));
   const [flipRef, setFlipRef] = useState<FlipBookRef | null>(null);
   const [bookLoading, setBookLoading] = useState(false);
 
@@ -60,7 +60,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
       const timeout = setTimeout(() => setSinglePage(magazine.page.spread === 'single'), 0);
       return () => clearTimeout(timeout);
     }
-  }, [magazine?.id]);
+  }, [magazine]);
 
   useEffect(() => {
     if (!isOpen || !magazine) return;
@@ -70,7 +70,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
       setBookLoading(true);
     }, 0);
     return () => clearTimeout(timeout);
-  }, [isOpen, magazine?.id, singlePage, isMobile]);
+  }, [isOpen, isMobile, magazine, singlePage]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -136,7 +136,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
         {/* Close button — top right */}
         <button
           onClick={onClose}
-          className={`absolute top-3 right-3 bg-[#7C5A3A] text-white rounded-full hover:bg-[#6A4C31] transition-all z-20 shadow-md ${isMobile ? 'p-1.5' : 'p-2'}`}
+          className={`absolute top-3 right-3 bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all z-20 shadow-md ${isMobile ? 'p-1.5' : 'p-2'}`}
         >
           <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -148,7 +148,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
           {/* Prev button */}
           <button
             onClick={() => flipRef?.pageFlip()?.flipPrev()}
-            className={`bg-[#7C5A3A] text-white rounded-full hover:bg-[#6A4C31] transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
+            className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
           >
             <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -161,7 +161,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
               className="flex items-center gap-3 bg-white/90 backdrop-blur-sm border border-gray-200 shadow rounded-full px-4 py-1"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className={`text-sm font-medium select-none transition-colors ${singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'}`}>
+              <span className={`text-sm font-medium select-none transition-colors ${singlePage ? 'text-mebel-olive' : 'text-gray-400'}`}>
                 Одна
               </span>
               <ToggleButton
@@ -174,7 +174,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                   inactive: { base: '#d1d5db', hover: '#9ca3af' },
                 }}
               />
-              <span className={`text-sm font-medium select-none transition-colors ${!singlePage ? 'text-[#7C5A3A]' : 'text-gray-400'}`}>
+              <span className={`text-sm font-medium select-none transition-colors ${!singlePage ? 'text-mebel-olive' : 'text-gray-400'}`}>
                 Розворот
               </span>
             </div>
@@ -183,7 +183,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
           {/* Next button */}
           <button
             onClick={() => flipRef?.pageFlip()?.flipNext()}
-            className={`bg-[#7C5A3A] text-white rounded-full hover:bg-[#6A4C31] transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
+            className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
           >
             <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
