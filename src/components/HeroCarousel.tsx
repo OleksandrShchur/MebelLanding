@@ -39,7 +39,7 @@ const HeroCarousel = () => {
   };
 
   return (
-    <section id="hero" className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden scroll-mt-[var(--header-height,3.5rem)]">
+    <section id="hero" className="relative h-[calc(100dvh-var(--header-height,3.5rem))] overflow-hidden scroll-mt-[var(--header-height,3.5rem)]">
       <div className="relative h-full overflow-hidden">
         {heroImages.map((image, index) => (
           <motion.div
@@ -52,7 +52,7 @@ const HeroCarousel = () => {
               alt={`Hero ${index + 1}`}
               className="h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-[#2F2A25]/35" />
+            <div className="absolute inset-0 bg-[#2F2A25]/50" />
           </motion.div>
         ))}
 
@@ -64,13 +64,13 @@ const HeroCarousel = () => {
         >
           <motion.h1
             variants={prefersReducedMotion ? instantItem : item}
-            className="hero-title mb-4 max-w-3xl text-white drop-shadow-md"
+            className="hero-title mb-4 max-w-3xl text-white drop-shadow-lg"
           >
             Якісні меблі для вашого дому
           </motion.h1>
           <motion.p
             variants={prefersReducedMotion ? instantItem : item}
-            className="mb-8 max-w-xl text-base text-mebel-cream/95 drop-shadow md:text-lg"
+            className="mb-8 max-w-xl text-base text-mebel-cream/95 drop-shadow-md md:text-lg"
           >
             Переглядайте каталоги меблів онлайн та обирайте ідеальні рішення для кожної кімнати.
           </motion.p>
