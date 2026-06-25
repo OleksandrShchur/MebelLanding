@@ -39,7 +39,7 @@ const HeroCarousel = () => {
   };
 
   return (
-    <section id="hero" className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden scroll-mt-14">
+    <section id="hero" className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden scroll-mt-[var(--header-height,3.5rem)]">
       <div className="relative h-full overflow-hidden">
         {heroImages.map((image, index) => (
           <motion.div

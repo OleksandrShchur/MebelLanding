@@ -69,11 +69,32 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [pendingSection, setPendingSection] = useState<string | null>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const headerHeight = 50;
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const updateHeight = () => {
+      const height = header.getBoundingClientRect().height;
+      setHeaderHeight(height);
+      document.documentElement.style.setProperty('--header-height', `${height}px`);
+    };
+
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(header);
+    window.addEventListener('resize', updateHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -85,7 +106,9 @@ const Header = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - headerHeight;
+      const offset =
+        headerRef.current?.getBoundingClientRect().height ?? headerHeight;
+      const top = element.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       setPendingSection(null);
     }
@@ -189,8 +212,8 @@ const Header = () => {
           {isMenuOpen && (
             <motion.div
               key="mobile-menu"
-              className="md:hidden fixed inset-x-0 z-40 overflow-hidden bg-white shadow-xl"
-              style={{ top: `${headerHeight}px` }}
+              className={`md:hidden fixed inset-x-0 z-40 overflow-hidden bg-white shadow-xl ${headerHeight ? '' : 'top-14'}`}
+              style={{ top: headerHeight ? `${headerHeight}px` : undefined }}
               initial={prefersReducedMotion ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={prefersReducedMotion ? { height: 'auto', opacity: 0 } : { height: 0, opacity: 0 }}
@@ -236,8 +259,8 @@ const Header = () => {
           {isMenuOpen && (
             <motion.div
               key="mobile-backdrop"
-              className="md:hidden fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px]"
-              style={{ top: `${headerHeight}px` }}
+              className={`md:hidden fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px] ${headerHeight ? '' : 'top-14'}`}
+              style={{ top: headerHeight ? `${headerHeight}px` : undefined }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -248,7 +271,7 @@ const Header = () => {
         </AnimatePresence>
       </header>
 
-      <div className="h-[50px]" aria-hidden="true" />
+      <div style={{ height: headerHeight || undefined }} className={headerHeight ? undefined : 'h-14'} aria-hidden="true" />
     </>
   );
 };
