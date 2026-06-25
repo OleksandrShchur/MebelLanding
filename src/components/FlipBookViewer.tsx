@@ -20,7 +20,7 @@ interface FlipBookViewerProps {
   pageDimensions: PageDimensions;
   displayHeight?: number;
   singlePage: boolean;
-  onBookReady?: (ref: FlipBookRef) => void;
+  onBookReady?: (ref: FlipBookRef, pageIndex: number) => void;
   onReadyChange?: (ready: boolean) => void;
   onPageChange?: (page: number) => void;
 }
@@ -125,7 +125,7 @@ const FlipBookViewer = ({
         pageFlip.turnToPage(currentPage);
       }
       if (bookRef.current) {
-        onBookReady?.(bookRef.current);
+        onBookReady?.(bookRef.current, currentPage);
       }
     }, 300);
     return () => window.clearTimeout(timeout);

@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Maximize2, Minimize2 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import LoadingSpinner from './LoadingSpinner';
@@ -61,9 +62,16 @@ function getAvailableBookArea(
   return fitBookSize(magazine, isMobile, singlePage, availW, availH);
 }
 
+function parsePageIndex(value: string | null): number {
+  if (!value) return 0;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) ? 0 : Math.max(0, parsed);
+}
+
 const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const prefersReducedMotion = useReducedMotion();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [singlePage, setSinglePage] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewport, setViewport] = useState(() => ({
@@ -73,8 +81,11 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   const [flipRef, setFlipRef] = useState<FlipBookRef | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [pageInput, setPageInput] = useState('1');
+  const [isEditingPage, setIsEditingPage] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const pageInputRef = useRef<HTMLInputElement>(null);
   const [chromeHeights, setChromeHeights] = useState({ header: 0, footer: 0 });
 
   const instant = { opacity: 1, scale: 1, y: 0 };
@@ -110,7 +121,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   useEffect(() => {
     if (!isOpen || !magazine) return;
     setFlipRef(null);
-    setCurrentPage(0);
+    setCurrentPage(parsePageIndex(searchParams.get('page')));
   }, [isOpen, magazine]);
 
   useEffect(() => {
@@ -151,15 +162,78 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     };
   }, [isOpen, isFullscreen, onClose]);
 
-  const handleBookReady = useCallback((ref: FlipBookRef) => {
+  const handleBookReady = useCallback((ref: FlipBookRef, pageIndex: number) => {
     setFlipRef(ref);
-    const pageIndex = ref.pageFlip().getCurrentPageIndex();
     setCurrentPage(pageIndex);
   }, []);
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
   }, []);
+
+  const goToPage = useCallback(
+    (targetPage: number, total: number) => {
+      const pageIndex = targetPage - 1;
+      if (pageIndex < 0 || pageIndex >= total) return false;
+
+      flipRef?.pageFlip()?.turnToPage(pageIndex);
+      setCurrentPage(pageIndex);
+      setSearchParams({ page: pageIndex.toString() }, { replace: true });
+      return true;
+    },
+    [flipRef, setSearchParams]
+  );
+
+  const totalPages = magazine?.images.length ?? 0;
+  const displayPage = totalPages > 0 ? Math.min(currentPage + 1, totalPages) : 1;
+  const maxPageDigits = totalPages > 0 ? String(totalPages).length : 1;
+
+  useEffect(() => {
+    if (!isEditingPage) {
+      setPageInput(String(displayPage));
+    }
+  }, [displayPage, isEditingPage]);
+
+  const handlePageInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    if (value === '' || (/^\d+$/.test(value) && value.length <= maxPageDigits)) {
+      setPageInput(value);
+    }
+  };
+
+  const commitPageInput = () => {
+    setIsEditingPage(false);
+
+    if (pageInput === '') {
+      setPageInput(String(displayPage));
+      return;
+    }
+
+    const targetPage = Number.parseInt(pageInput, 10);
+    if (Number.isNaN(targetPage) || targetPage < 1 || targetPage > totalPages) {
+      setPageInput(String(displayPage));
+      return;
+    }
+
+    if (targetPage !== displayPage) {
+      goToPage(targetPage, totalPages);
+    } else {
+      setPageInput(String(displayPage));
+    }
+  };
+
+  const handlePageInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      pageInputRef.current?.blur();
+    }
+
+    if (event.key === 'Escape') {
+      setPageInput(String(displayPage));
+      setIsEditingPage(false);
+      pageInputRef.current?.blur();
+    }
+  };
 
   if (!magazine) return null;
 
@@ -184,8 +258,6 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     ? viewport.width
     : Math.min(bookSize.width + BOOK_HORIZONTAL_PADDING, viewport.width - PADDING * 2);
 
-  const totalPages = magazine.images.length;
-  const displayPage = Math.min(currentPage + 1, totalPages);
   const progress = totalPages > 0 ? (displayPage / totalPages) * 100 : 0;
 
   return (
@@ -223,19 +295,32 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
               ref={headerRef}
               className="relative z-20 shrink-0 border-b border-mebel-border bg-mebel-surface-raised px-4 pt-3 pb-2"
             >
-              <div className="flex items-center justify-center min-h-[28px]">
-                <AnimatePresence mode="wait">
-                  <motion.p
-                    key={displayPage}
-                    className="text-sm font-medium text-mebel-text-subtle"
-                    initial={prefersReducedMotion ? instant : { opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={prefersReducedMotion ? instant : { opacity: 0, y: -6 }}
-                    transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    Сторінка {displayPage} / {totalPages}
-                  </motion.p>
-                </AnimatePresence>
+              <div className="flex flex-col items-center justify-center min-h-[28px] gap-1">
+                <div className="flex items-center justify-center gap-1.5 text-sm font-medium text-mebel-text-subtle">
+                  <span>Сторінка</span>
+                  <input
+                    ref={pageInputRef}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={pageInput}
+                    onChange={handlePageInputChange}
+                    onFocus={() => setIsEditingPage(true)}
+                    onBlur={commitPageInput}
+                    onKeyDown={handlePageInputKeyDown}
+                    aria-label={`Номер сторінки від 1 до ${totalPages}`}
+                    title={`Введіть номер сторінки (1–${totalPages}) і натисніть Enter`}
+                    className={`w-11 rounded-md border bg-white px-1.5 py-0.5 text-center text-sm font-semibold text-mebel-olive tabular-nums transition-colors focus:outline-none focus:ring-2 focus:ring-mebel-tan/60 ${
+                      isEditingPage
+                        ? 'border-mebel-tan shadow-sm'
+                        : 'border-mebel-border hover:border-mebel-tan/70'
+                    }`}
+                  />
+                  <span aria-hidden="true">/ {totalPages}</span>
+                </div>
+                <p className="text-[11px] leading-tight text-mebel-text-subtle/80">
+                  Натисніть на номер, щоб перейти до сторінки
+                </p>
               </div>
               <div className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-mebel-border-muted">
                 <motion.div
