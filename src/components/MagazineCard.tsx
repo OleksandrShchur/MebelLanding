@@ -18,7 +18,7 @@ const MagazineCard = ({ magazine, onClick, disabled = false }: MagazineCardProps
       className="group w-full text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mebel-olive disabled:cursor-not-allowed disabled:opacity-60"
       aria-label={`Відкрити каталог ${magazine.name}`}
     >
-      <div className="overflow-hidden rounded-[26px] border border-mebel-border-muted bg-mebel-surface-raised p-0 shadow-mebel-sm transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:border-mebel-tan group-hover:shadow-mebel-md group-active:translate-y-0 group-active:scale-[0.985] group-disabled:hover:translate-y-0 group-disabled:hover:shadow-mebel-sm group-disabled:active:scale-100">
+      <div className="overflow-hidden rounded-[26px] border border-mebel-border-muted bg-mebel-surface-raised p-0 shadow-mebel-md transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:border-mebel-tan group-hover:shadow-mebel-md group-active:translate-y-0 group-active:scale-[0.985] group-disabled:hover:translate-y-0 group-disabled:hover:shadow-mebel-md group-disabled:active:scale-100">
         <div className="m-2 mb-0 overflow-hidden rounded-[22px] border border-mebel-border-muted bg-gradient-to-b from-mebel-surface-raised to-mebel-cream">
           <img
             src={coverImage ? assetUrl(coverImage) : assetUrl('images/top/1.jpg')}
