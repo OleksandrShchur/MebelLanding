@@ -41,10 +41,10 @@ function getModalDimensions(
 const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [singlePage, setSinglePage] = useState(false);
-  const [viewport, setViewport] = useState({
+  const [viewport, setViewport] = useState(() => ({
     width: window.innerWidth,
     height: window.innerHeight,
-  });
+  }));
   const [flipRef, setFlipRef] = useState<FlipBookRef | null>(null);
   const [bookLoading, setBookLoading] = useState(false);
 

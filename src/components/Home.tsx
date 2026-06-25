@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import HeroCarousel from './HeroCarousel';
 import CategoriesGrid from './CategoriesGrid';
 import CategorySection from './CategorySection';
@@ -10,11 +10,17 @@ import { categories } from '../data/categories';
 
 function Home() {
   const { data, loading, error } = useGallery();
-  const location = useLocation();
+  const { category: categoryParam, magazineId: magazineIdParam } = useParams<{
+    category?: string;
+    magazineId?: string;
+  }>();
   const navigate = useNavigate();
 
-  const { category, magazineId } = parseCatalogParams(location.pathname);
-  const selectedMagazine = data && category && magazineId && isValidCategory(category) && isValidId(magazineId)
+  const selectedMagazine = data &&
+    categoryParam &&
+    magazineIdParam &&
+    isValidCategory(categoryParam) &&
+    isValidId(magazineIdParam)
     ? findMagazineByCategoryAndId(data, category as Category, parseInt(magazineId))
     : null;
   const isModalOpen = !!selectedMagazine;
@@ -83,14 +89,6 @@ function isValidCategory(category: string): category is Category {
 
 function isValidId(id: string): boolean {
   return !isNaN(parseInt(id)) && parseInt(id) > 0;
-}
-
-function parseCatalogParams(pathname: string): { category: string | null; magazineId: string | null } {
-  const parts = pathname.split('/').filter(Boolean);
-  if (parts.length >= 3 && parts[0] === 'catalog') {
-    return { category: parts[1], magazineId: parts[2] };
-  }
-  return { category: null, magazineId: null };
 }
 
 export default Home;
