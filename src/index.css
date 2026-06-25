@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
 @theme {
   --color-mebel-olive: #7c5a3a;
@@ -29,6 +30,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  font-family: 'DM Sans', sans-serif;
   background-color: var(--color-mebel-cream);
   color: var(--color-mebel-text);
 }

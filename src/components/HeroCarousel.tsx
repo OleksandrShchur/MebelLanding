@@ -64,7 +64,7 @@ const HeroCarousel = () => {
         >
           <motion.h1
             variants={prefersReducedMotion ? instantItem : item}
-            className="hero-title mb-4 max-w-3xl text-white drop-shadow-lg"
+            className="hero-title mb-4 max-w-3xl font-display text-white drop-shadow-lg"
           >
             Якісні меблі для вашого дому
           </motion.h1>

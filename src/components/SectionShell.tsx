@@ -47,7 +47,7 @@ const SectionShell = ({
           >
             <h2
               id={headingId}
-              className="text-2xl font-bold text-mebel-text-strong md:text-3xl"
+              className="text-2xl font-display font-bold text-mebel-text-strong md:text-3xl"
             >
               {title}
             </h2>

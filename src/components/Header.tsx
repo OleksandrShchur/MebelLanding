@@ -176,7 +176,7 @@ const Header = () => {
         }`}
       >
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-          <h1 className="flex items-center text-xl md:text-2xl font-bold text-mebel-text-strong">
+          <h1 className="flex items-center text-xl md:text-2xl font-display font-bold text-mebel-text-strong">
             <SofaIcon />
             Магазин Mebel
           </h1>

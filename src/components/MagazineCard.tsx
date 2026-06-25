@@ -28,7 +28,7 @@ const MagazineCard = ({ magazine, onClick, disabled = false }: MagazineCardProps
           />
         </div>
         <div className="p-4 pt-5 text-center">
-          <h3 className="mb-2 text-base font-semibold text-mebel-text-strong md:text-lg">
+          <h3 className="mb-2 text-base font-display font-semibold text-mebel-text-strong md:text-lg">
             {magazine.name}
           </h3>
         </div>

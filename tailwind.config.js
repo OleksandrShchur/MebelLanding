@@ -5,7 +5,12 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        display: ['"Bodoni Moda"', 'Georgia', 'serif'],
+        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }

@@ -20,7 +20,7 @@ const Layout = ({ children }: LayoutProps) => {
     : { duration: 0.22, ease: 'easeOut' as const };
 
   return (
-    <div className="min-h-screen bg-mebel-cream">
+    <div className="min-h-screen bg-mebel-cream font-sans">
       <Header />
       <AnimatePresence mode="wait">
         <motion.div

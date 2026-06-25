@@ -134,7 +134,7 @@ const CategoriesGrid = ({
                     />
                   </div>
                   <div className="flex min-h-16 shrink-0 items-center justify-center px-2 pb-2 pt-4 text-center md:px-3 md:pb-3 md:pt-5">
-                    <h3 className="text-sm font-semibold leading-snug text-mebel-text-strong md:text-lg">
+                    <h3 className="text-sm font-display font-semibold leading-snug text-mebel-text-strong md:text-lg">
                       {category.name}
                     </h3>
                   </div>
