@@ -110,6 +110,7 @@ const CategoriesGrid = ({
           {items.map((category, index) => (
             <motion.div
               key={category.id}
+              className="h-full"
               custom={index}
               variants={prefersReducedMotion ? reducedVariants : cardVariants}
               initial="hidden"
@@ -120,11 +121,11 @@ const CategoriesGrid = ({
                 type="button"
                 onClick={() => onSelect(category.id)}
                 disabled={category.disabled}
-                className="group w-full text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mebel-olive disabled:cursor-not-allowed disabled:opacity-60"
+                className="group h-full w-full text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mebel-olive disabled:cursor-not-allowed disabled:opacity-60"
                 aria-label={`Перейти до категорії ${category.name}`}
               >
-                <div className="flex min-h-[188px] w-full flex-col rounded-[26px] border border-mebel-border-muted bg-mebel-surface-raised p-3 text-mebel-text-strong shadow-mebel-md transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:border-mebel-tan group-hover:shadow-mebel-md group-active:translate-y-0 group-active:scale-[0.985] group-disabled:hover:translate-y-0 group-disabled:hover:shadow-mebel-md group-disabled:active:scale-100 md:min-h-[280px] md:p-4 md:group-hover:-translate-y-2">
-                  <div className="flex min-h-[112px] items-center justify-center rounded-[22px] border border-mebel-border-muted bg-gradient-to-b from-mebel-surface-raised to-mebel-cream px-4 py-5 transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02] md:min-h-[176px] md:px-6 md:py-8">
+                <div className="flex h-full min-h-[188px] w-full flex-col rounded-[26px] border border-mebel-border-muted bg-mebel-surface-raised p-3 text-mebel-text-strong shadow-mebel-md transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:border-mebel-tan group-hover:shadow-mebel-md group-active:translate-y-0 group-active:scale-[0.985] group-disabled:hover:translate-y-0 group-disabled:hover:shadow-mebel-md group-disabled:active:scale-100 md:min-h-[280px] md:p-4 md:group-hover:-translate-y-2">
+                  <div className="flex min-h-[112px] flex-1 items-center justify-center rounded-[22px] border border-mebel-border-muted bg-gradient-to-b from-mebel-surface-raised to-mebel-cream px-4 py-5 transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02] md:min-h-[176px] md:px-6 md:py-8">
                     <img
                       src={category.imageSrc}
                       alt={category.imageAlt ?? category.name}
@@ -132,7 +133,7 @@ const CategoriesGrid = ({
                       loading="lazy"
                     />
                   </div>
-                  <div className="mt-auto flex min-h-16 items-center justify-center px-2 pb-2 pt-4 text-center md:px-3 md:pb-3 md:pt-5">
+                  <div className="flex min-h-16 shrink-0 items-center justify-center px-2 pb-2 pt-4 text-center md:px-3 md:pb-3 md:pt-5">
                     <h3 className="text-sm font-semibold leading-snug text-mebel-text-strong md:text-lg">
                       {category.name}
                     </h3>
