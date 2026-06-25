@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import LoadingSpinner from './LoadingSpinner';
+import { prefetchMagazinePages } from '../hooks/useCatalogPageLoader';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import ToggleButton from 'react-toggle-button';
@@ -68,6 +69,10 @@ function parsePageIndex(value: string | null): number {
   return Number.isNaN(parsed) ? 0 : Math.max(0, parsed);
 }
 
+function bucketBookDimension(value: number, step = 80): number {
+  return Math.max(step, Math.round(value / step) * step);
+}
+
 const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const prefersReducedMotion = useReducedMotion();
@@ -78,7 +83,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     width: window.innerWidth,
     height: window.innerHeight,
   }));
-  const [flipRef, setFlipRef] = useState<FlipBookRef | null>(null);
+  const flipRef = useRef<FlipBookRef | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageInput, setPageInput] = useState('1');
@@ -112,7 +117,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   useEffect(() => {
     if (!isOpen) {
       setViewerReady(false);
-      setFlipRef(null);
+      flipRef.current = null;
       setCurrentPage(0);
       setIsFullscreen(false);
     }
@@ -120,8 +125,9 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
   useEffect(() => {
     if (!isOpen || !magazine) return;
-    setFlipRef(null);
+    flipRef.current = null;
     setCurrentPage(parsePageIndex(searchParams.get('page')));
+    prefetchMagazinePages(magazine.images, 3);
   }, [isOpen, magazine]);
 
   useEffect(() => {
@@ -163,7 +169,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   }, [isOpen, isFullscreen, onClose]);
 
   const handleBookReady = useCallback((ref: FlipBookRef, pageIndex: number) => {
-    setFlipRef(ref);
+    flipRef.current = ref;
     setCurrentPage(pageIndex);
   }, []);
 
@@ -176,12 +182,12 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
       const pageIndex = targetPage - 1;
       if (pageIndex < 0 || pageIndex >= total) return false;
 
-      flipRef?.pageFlip()?.turnToPage(pageIndex);
+      flipRef.current?.pageFlip()?.turnToPage(pageIndex);
       setCurrentPage(pageIndex);
       setSearchParams({ page: pageIndex.toString() }, { replace: true });
       return true;
     },
-    [flipRef, setSearchParams]
+    [setSearchParams]
   );
 
   const totalPages = magazine?.images.length ?? 0;
@@ -368,7 +374,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                   style={{ width: bookSize.width, height: bookSize.height }}
                 >
                   <FlipBookViewer
-                    key={`${bookSize.width}x${bookSize.height}-${effectiveSinglePage}-${isFullscreen}`}
+                    key={`${bucketBookDimension(bookSize.width)}x${bucketBookDimension(bookSize.height)}-${effectiveSinglePage}-${isFullscreen}`}
                     images={magazine.images}
                     orientation={magazine.orientation}
                     pageDimensions={magazine.page}
@@ -402,7 +408,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
             >
               <button
                 type="button"
-                onClick={() => flipRef?.pageFlip()?.flipPrev()}
+                onClick={() => flipRef.current?.pageFlip()?.flipPrev()}
                 className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
                 aria-label="Попередня сторінка"
               >
@@ -437,7 +443,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
               <button
                 type="button"
-                onClick={() => flipRef?.pageFlip()?.flipNext()}
+                onClick={() => flipRef.current?.pageFlip()?.flipNext()}
                 className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
                 aria-label="Наступна сторінка"
               >
