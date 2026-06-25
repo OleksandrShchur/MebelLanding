@@ -131,10 +131,10 @@ const Header = () => {
 
       <header
         ref={headerRef}
-        className="sticky top-0 z-50 bg-white shadow-md border-b border-[#E6E1DA]"
+        className="sticky top-0 z-50 bg-white shadow-md border-b border-mebel-border"
       >
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-          <h1 className="flex items-center text-xl md:text-2xl font-bold text-[#2F2A25]">
+          <h1 className="flex items-center text-xl md:text-2xl font-bold text-mebel-text-strong">
             <SofaIcon />
             Магазин Mebel
           </h1>
@@ -145,9 +145,9 @@ const Header = () => {
               <button
                 key={id}
                 onClick={() => handleNavClick(id)}
-                className="group flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent text-[#5B544E] hover:text-[#2F2A25] hover:bg-[#F5F0EB] transition-all duration-200"
+                className="nav-btn group flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent text-mebel-text hover:text-mebel-text-strong hover:bg-mebel-hover transition-all duration-200"
               >
-                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-[#5B3E28]/15 group-hover:bg-[#5B3E28]/20 transition-colors text-[#F7F5F2]">
+                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-mebel-olive/15 group-hover:bg-mebel-olive/20 transition-colors text-current">
                   <Icon />
                 </span>
                 <span className="text-sm font-medium">{label}</span>
@@ -157,7 +157,7 @@ const Header = () => {
 
           {/* Hamburger Button — animated 3-line stack */}
           <button
-            className="md:hidden w-9 h-9 flex flex-col items-center justify-center rounded-lg text-[#5B544E] hover:text-[#2F2A25] hover:bg-[#F5F0EB] transition-colors"
+            className="nav-btn md:hidden w-9 h-9 flex flex-col items-center justify-center rounded-lg text-mebel-text hover:text-mebel-text-strong hover:bg-mebel-hover transition-colors"
             onClick={() => setIsMenuOpen(prev => !prev)}
             aria-label={isMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
             aria-expanded={isMenuOpen}
@@ -180,16 +180,16 @@ const Header = () => {
           }}
         >
           {/* Decorative top accent line */}
-          <div className="h-0.5 bg-gradient-to-r from-[#7D5C3C] via-[#A67C5B] to-transparent" />
+          <div className="h-0.5 bg-gradient-to-r from-mebel-olive via-mebel-warm to-transparent" />
 
           <div className="px-4 py-4 space-y-2">
             {isMenuOpen && navItems.map(({ id, label, Icon }) => (
               <button
                 key={id}
                 onClick={() => handleNavClick(id)}
-                className="menu-item group flex items-center gap-3 w-full text-left px-4 py-3.5 rounded-xl bg-[#7D5C3C] text-white font-medium hover:bg-[#6B4E32] active:scale-[0.98] transition-all duration-150"
+                className="nav-btn menu-item group flex items-center gap-3 w-full text-left px-4 py-3.5 rounded-xl bg-mebel-olive text-white font-medium hover:bg-mebel-olive-dark active:scale-[0.98] transition-all duration-150"
               >
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/15 group-hover:bg-white/25 transition-colors shrink-0">
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/15 group-hover:bg-white/25 transition-colors shrink-0 text-white">
                   <Icon />
                 </span>
                 <span className="text-sm tracking-wide">{label}</span>

@@ -12,7 +12,7 @@ const Layout = ({ children }: LayoutProps) => {
   const isModalOpen = location.pathname.includes('/catalog/');
 
   return (
-    <div className="min-h-screen bg-[#F7F5F2]">
+    <div className="min-h-screen bg-mebel-cream">
       <Header />
       {children}
       <Footer />

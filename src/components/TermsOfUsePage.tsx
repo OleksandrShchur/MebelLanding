@@ -16,16 +16,16 @@ const TermsOfUsePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#F8F5F0] text-[#2F2A25]">
-            <section className="border-b border-[#E7DED2] bg-gradient-to-b from-[#F6F1EA] to-[#F8F5F0]">
+        <div className="min-h-screen bg-mebel-cream text-mebel-text-strong">
+            <section className="border-b border-mebel-border bg-gradient-to-b from-mebel-surface to-mebel-cream">
                 <div className="max-w-5xl mx-auto px-6 md:px-10 py-16 md:py-24">
-                    <p className="text-sm uppercase tracking-[0.2em] text-[#8A6A4A] mb-4">
+                    <p className="text-sm uppercase tracking-[0.2em] text-mebel-accent mb-4">
                         Mebel Landing
                     </p>
                     <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-6">
                         Умови використання сайту
                     </h1>
-                    <p className="max-w-3xl text-base md:text-lg leading-8 text-[#5C5147]">
+                    <p className="max-w-3xl text-base md:text-lg leading-8 text-mebel-text">
                         Ці умови регулюють порядок використання сайту, перегляду матеріалів,
                         взаємодії з формами зворотного зв’язку та іншими сервісами, що
                         розміщені на цьому вебресурсі.
@@ -35,10 +35,10 @@ const TermsOfUsePage = () => {
 
             <section>
                 <div className="max-w-5xl mx-auto px-6 md:px-10 py-12 md:py-16">
-                    <div className="bg-white/80 backdrop-blur-sm border border-[#E7DED2] rounded-3xl shadow-[0_10px_30px_rgba(47,42,37,0.06)] p-6 md:p-10 space-y-10">
+                    <div className="bg-white/80 backdrop-blur-sm border border-mebel-border rounded-3xl shadow-mebel-card p-6 md:p-10 space-y-10">
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">1. Загальні положення</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     1.1. Користуючись цим сайтом, ви підтверджуєте, що ознайомилися
                                     з цими умовами використання та погоджуєтеся дотримуватися їх у
@@ -59,7 +59,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">2. Використання матеріалів сайту</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     2.1. Уся інформація, тексти, зображення, елементи дизайну,
                                     логотипи, каталоги, описи товарів та інші матеріали, розміщені
@@ -82,7 +82,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">3. Інформація про товари та послуги</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     3.1. Інформація про товари, їх характеристики, комплектацію,
                                     кольори, розміри, наявність та вартість, представлена на сайті,
@@ -103,7 +103,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">4. Поведінка користувача</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     4.1. Користувач зобов’язується не використовувати сайт для
                                     розміщення або передачі незаконної, образливої, шкідливої,
@@ -124,7 +124,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">5. Форми зворотного зв’язку та комунікація</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     5.1. Надсилаючи повідомлення через форми сайту, користувач
                                     підтверджує достовірність наданої інформації.
@@ -145,7 +145,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">6. Обмеження відповідальності</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     6.1. Сайт надається на умовах «як є». Адміністрація не гарантує,
                                     що сайт працюватиме безперервно, без помилок або що будь-які
@@ -166,7 +166,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">7. Посилання на сторонні ресурси</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     7.1. Сайт може містити посилання на сторонні вебресурси для
                                     зручності користувачів.
@@ -181,7 +181,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">8. Захист персональних даних</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     8.1. Обробка персональних даних користувачів здійснюється
                                     відповідно до чинного законодавства та окремих документів сайту,
@@ -198,7 +198,7 @@ const TermsOfUsePage = () => {
 
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">9. Прикінцеві положення</h2>
-                            <div className="space-y-4 text-[#4F463F] leading-8">
+                            <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     9.1. До цих умов використання застосовується чинне законодавство
                                     України.
@@ -215,7 +215,7 @@ const TermsOfUsePage = () => {
                             </div>
                         </section>
 
-                        <div className="pt-6 border-t border-[#E7DED2] text-sm text-[#7A6F64]">
+                        <div className="pt-6 border-t border-mebel-border text-sm text-mebel-text-muted">
                             Останнє оновлення: 7 квітня 2026
                         </div>
                     </div>

@@ -32,3 +32,21 @@ export interface CategoryData {
   name: string;
   imageId: string;
 }
+
+export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
+
+export interface CategoryItem {
+  id: Category;
+  name: string;
+  imageSrc: string;
+  imageAlt?: string;
+  disabled?: boolean;
+}
+
+export interface CategorySectionViewModel {
+  category: Category;
+  title: string;
+  magazines: Magazine[];
+  isEmpty: boolean;
+  missing: boolean;
+}
