@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
+import LoadingSpinner from './LoadingSpinner';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import ToggleButton from 'react-toggle-button';
-import { assetUrl } from '../utils/assets';
 
 interface MagazineModalProps {
   magazine: Magazine | null;
@@ -15,41 +15,50 @@ interface MagazineModalProps {
 }
 
 const PADDING = 8;
-const ARROW_WIDTH = 48;
-const HEADER_HEIGHT = 52;
-const FILMSTRIP_HEIGHT = 88;
-const BOTTOM_BAR_HEIGHT = 56;
+const HEADER_FALLBACK = 72;
+const FOOTER_FALLBACK = 80;
+const BOOK_HORIZONTAL_PADDING = 16;
 
-function getModalDimensions(
+function fitBookSize(
+  magazine: Magazine,
+  isMobile: boolean,
+  singlePage: boolean,
+  areaWidth: number,
+  areaHeight: number
+) {
+  if (areaWidth < 1 || areaHeight < 1) return null;
+
+  const pageAspect = magazine.page.width / magazine.page.height;
+  const spreadAspect = isMobile || singlePage ? pageAspect : pageAspect * 2;
+
+  let width = areaWidth;
+  let height = width / spreadAspect;
+
+  if (height > areaHeight) {
+    height = areaHeight;
+    width = height * spreadAspect;
+  }
+
+  return { width: Math.round(width), height: Math.round(height) };
+}
+
+function getAvailableBookArea(
   magazine: Magazine,
   isMobile: boolean,
   singlePage: boolean,
   viewportWidth: number,
   viewportHeight: number,
-  isFullscreen: boolean
+  isFullscreen: boolean,
+  headerHeight: number,
+  footerHeight: number
 ) {
-  const pageAspect = magazine.page.width / magazine.page.height;
-  const spreadAspect = isMobile || singlePage ? pageAspect : pageAspect * 2;
+  const horizontalInset = isFullscreen ? 0 : PADDING * 2 + BOOK_HORIZONTAL_PADDING;
+  const verticalInset = isFullscreen ? 0 : PADDING * 2;
 
-  const horizontalReserve = isFullscreen
-    ? PADDING * 2
-    : PADDING * 4 + (isMobile ? 0 : ARROW_WIDTH * 2);
-  const verticalReserve = isFullscreen
-    ? HEADER_HEIGHT + FILMSTRIP_HEIGHT + BOTTOM_BAR_HEIGHT + PADDING * 2
-    : HEADER_HEIGHT + FILMSTRIP_HEIGHT + BOTTOM_BAR_HEIGHT + PADDING * 4;
+  const availW = viewportWidth - horizontalInset;
+  const availH = viewportHeight - verticalInset - headerHeight - footerHeight;
 
-  const availW = viewportWidth - horizontalReserve;
-  const availH = viewportHeight - verticalReserve;
-
-  let width = availW;
-  let height = width / spreadAspect;
-
-  if (height > availH) {
-    height = availH;
-    width = height * spreadAspect;
-  }
-
-  return { width: Math.round(width), height: Math.round(height) };
+  return fitBookSize(magazine, isMobile, singlePage, availW, availH);
 }
 
 const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
@@ -64,7 +73,9 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   const [flipRef, setFlipRef] = useState<FlipBookRef | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [chromeHeights, setChromeHeights] = useState({ header: 0, footer: 0 });
 
   const instant = { opacity: 1, scale: 1, y: 0 };
   const panelSpring = prefersReducedMotion
@@ -83,22 +94,42 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
   useEffect(() => {
     if (magazine) {
-      const timeout = setTimeout(() => setSinglePage(magazine.page.spread === 'single'), 0);
-      return () => clearTimeout(timeout);
+      setSinglePage(magazine.page.spread === 'single');
     }
   }, [magazine]);
 
   useEffect(() => {
-    if (!isOpen || !magazine) return;
-
-    const timeout = setTimeout(() => {
-      setFlipRef(null);
+    if (!isOpen) {
       setViewerReady(false);
+      setFlipRef(null);
       setCurrentPage(0);
       setIsFullscreen(false);
-    }, 0);
-    return () => clearTimeout(timeout);
-  }, [isOpen, isMobile, magazine, singlePage]);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !magazine) return;
+    setFlipRef(null);
+    setCurrentPage(0);
+  }, [isOpen, magazine]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const measure = () => {
+      setChromeHeights({
+        header: headerRef.current?.offsetHeight ?? 0,
+        footer: footerRef.current?.offsetHeight ?? 0,
+      });
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (headerRef.current) observer.observe(headerRef.current);
+    if (footerRef.current) observer.observe(footerRef.current);
+
+    return () => observer.disconnect();
+  }, [isOpen, isFullscreen, isMobile, singlePage, magazine]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -120,15 +151,6 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     };
   }, [isOpen, isFullscreen, onClose]);
 
-  useEffect(() => {
-    const activeThumb = thumbnailRefs.current[currentPage];
-    activeThumb?.scrollIntoView({
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
-      inline: 'center',
-      block: 'nearest',
-    });
-  }, [currentPage, prefersReducedMotion]);
-
   const handleBookReady = useCallback((ref: FlipBookRef) => {
     setFlipRef(ref);
     const pageIndex = ref.pageFlip().getCurrentPageIndex();
@@ -139,43 +161,32 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     setCurrentPage(page);
   }, []);
 
-  const handleThumbnailClick = (index: number) => {
-    flipRef?.pageFlip()?.turnToPage(index);
-    setCurrentPage(index);
-  };
-
   if (!magazine) return null;
 
   const effectiveSinglePage = isMobile ? true : singlePage;
 
-  const { width, height } = getModalDimensions(
-    magazine,
-    isMobile,
-    singlePage,
-    viewport.width,
-    viewport.height,
-    isFullscreen
-  );
+  const headerHeight = chromeHeights.header || HEADER_FALLBACK;
+  const footerHeight = chromeHeights.footer || FOOTER_FALLBACK;
 
-  const totalWidth = isFullscreen
+  const bookSize =
+    getAvailableBookArea(
+      magazine,
+      isMobile,
+      singlePage,
+      viewport.width,
+      viewport.height,
+      isFullscreen,
+      headerHeight,
+      footerHeight
+    ) ?? { width: 0, height: 0 };
+
+  const modalWidth = isFullscreen
     ? viewport.width
-    : isMobile
-      ? Math.min(width, viewport.width - PADDING * 2)
-      : width + ARROW_WIDTH * 2;
-
-  const totalHeight = isFullscreen
-    ? viewport.height
-    : height + HEADER_HEIGHT + FILMSTRIP_HEIGHT + BOTTOM_BAR_HEIGHT;
+    : Math.min(bookSize.width + BOOK_HORIZONTAL_PADDING, viewport.width - PADDING * 2);
 
   const totalPages = magazine.images.length;
   const displayPage = Math.min(currentPage + 1, totalPages);
   const progress = totalPages > 0 ? (displayPage / totalPages) * 100 : 0;
-
-  const pageAspect = magazine.page.width / magazine.page.height;
-  const skeletonPageWidth = isMobile
-    ? Math.min(width, viewport.width - PADDING * 4)
-    : Math.round((height - 16) * pageAspect);
-  const skeletonPageHeight = height - 16;
 
   return (
     <AnimatePresence>
@@ -191,12 +202,16 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
         >
           <motion.div
             layout
-            className={`relative overflow-hidden bg-mebel-surface-raised shadow-mebel-md ${
+            className={`relative flex flex-col overflow-hidden bg-mebel-surface-raised shadow-mebel-md ${
               isFullscreen
-                ? 'fixed inset-0 h-screen w-screen rounded-none'
+                ? 'fixed inset-0 h-dvh w-screen justify-between rounded-none'
                 : 'rounded-lg'
             }`}
-            style={isFullscreen ? undefined : { width: totalWidth, height: totalHeight }}
+            style={
+              isFullscreen
+                ? undefined
+                : { width: modalWidth, maxHeight: viewport.height - PADDING * 2 }
+            }
             initial={prefersReducedMotion ? instant : { opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={prefersReducedMotion ? instant : { opacity: 0, scale: 0.96, y: 8 }}
@@ -204,7 +219,10 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header — page progress */}
-            <div className="relative z-20 border-b border-mebel-border bg-mebel-surface-raised px-4 pt-3 pb-2">
+            <div
+              ref={headerRef}
+              className="relative z-20 shrink-0 border-b border-mebel-border bg-mebel-surface-raised px-4 pt-3 pb-2"
+            >
               <div className="flex items-center justify-center min-h-[28px]">
                 <AnimatePresence mode="wait">
                   <motion.p
@@ -256,81 +274,46 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
             {/* Book area */}
             <div
-              className="relative flex items-center justify-center px-2"
-              style={{ height: height + 8 }}
+              className="relative flex shrink-0 items-center justify-center overflow-hidden px-2"
+              style={{ height: bookSize.height }}
             >
-              <FlipBookViewer
-                key={`${width}x${height}-${effectiveSinglePage}-${isFullscreen}`}
-                images={magazine.images}
-                orientation={magazine.orientation}
-                pageDimensions={magazine.page}
-                displayHeight={height - 8}
-                singlePage={effectiveSinglePage}
-                onBookReady={handleBookReady}
-                onReadyChange={setViewerReady}
-                onPageChange={handlePageChange}
-              />
+              {bookSize.height > 0 && (
+                <div
+                  className="overflow-hidden"
+                  style={{ width: bookSize.width, height: bookSize.height }}
+                >
+                  <FlipBookViewer
+                    key={`${bookSize.width}x${bookSize.height}-${effectiveSinglePage}-${isFullscreen}`}
+                    images={magazine.images}
+                    orientation={magazine.orientation}
+                    pageDimensions={magazine.page}
+                    displayHeight={bookSize.height}
+                    singlePage={effectiveSinglePage}
+                    onBookReady={handleBookReady}
+                    onReadyChange={setViewerReady}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
 
               <AnimatePresence>
                 {!viewerReady && (
                   <motion.div
-                    className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-mebel-surface-raised/80 px-4"
+                    className="absolute inset-0 z-10"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <div
-                      className="animate-pulse rounded-lg border border-mebel-border bg-mebel-skeleton"
-                      style={{ width: skeletonPageWidth, height: skeletonPageHeight }}
-                    />
-                    {!isMobile && !effectiveSinglePage && (
-                      <div
-                        className="animate-pulse rounded-lg border border-mebel-border bg-mebel-skeleton"
-                        style={{ width: skeletonPageWidth, height: skeletonPageHeight }}
-                      />
-                    )}
+                    <LoadingSpinner overlay label="Завантаження..." />
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* Thumbnail filmstrip */}
+            {/* Bottom bar — prev/next + toggle */}
             <div
-              className="border-t border-mebel-border bg-mebel-cream px-3 py-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              style={{ height: FILMSTRIP_HEIGHT }}
-            >
-              <div className="flex gap-2 min-w-min">
-                {magazine.images.map((image, index) => (
-                  <button
-                    key={index}
-                    ref={(el) => {
-                      thumbnailRefs.current[index] = el;
-                    }}
-                    type="button"
-                    onClick={() => handleThumbnailClick(index)}
-                    className={`shrink-0 overflow-hidden rounded-lg border border-mebel-border transition-shadow ${
-                      currentPage === index ? 'ring-2 ring-mebel-tan' : ''
-                    }`}
-                    aria-label={`Перейти до сторінки ${index + 1}`}
-                    aria-current={currentPage === index ? 'true' : undefined}
-                  >
-                    <img
-                      src={assetUrl(image)}
-                      alt={`Мініатюра сторінки ${index + 1}`}
-                      width={52}
-                      height={72}
-                      className="h-[72px] w-[52px] object-cover"
-                      loading="lazy"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom overlay bar — prev/next + toggle */}
-            <div
-              className="flex items-center justify-between border-t border-mebel-border bg-mebel-surface-raised px-4 z-20"
-              style={{ height: BOTTOM_BAR_HEIGHT }}
+              ref={footerRef}
+              className="z-20 flex shrink-0 items-center justify-between border-t border-mebel-border bg-mebel-surface-raised px-4 py-3"
             >
               <button
                 type="button"

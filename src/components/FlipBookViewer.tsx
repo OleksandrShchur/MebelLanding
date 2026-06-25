@@ -169,7 +169,7 @@ const FlipBookViewer = ({
 
   return (
     <div
-      className="w-full h-full flex items-center justify-center touch-pan-y"
+      className="h-full w-full overflow-hidden flex items-center justify-center touch-pan-y"
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onTouchStart={(e) => e.preventDefault()}
@@ -220,17 +220,17 @@ const FlipBookViewer = ({
         <HTMLFlipBook
           ref={bookRef}
           key={`${isMobile ? 'mobile' : 'desktop'}-${pageWidth}x${pageHeight}-${singlePage}`}
-          width={pageWidth - 8}
+          width={pageWidth}
           height={pageHeight}
-          size={isMobile ? 'fixed' : 'stretch'}
+          size="fixed"
           minWidth={Math.round(pageWidth * 0.4)}
-          maxWidth={Math.round(pageWidth * 1.5)}
+          maxWidth={pageWidth}
           minHeight={Math.round(pageHeight * 0.4)}
-          maxHeight={Math.round(pageHeight * 1.5)}
+          maxHeight={pageHeight}
           usePortrait={isMobile}
           drawShadow={true}
-          autoSize={true}
-          style={{}}
+          autoSize={false}
+          style={{ maxWidth: '100%', maxHeight: '100%' }}
           {...commonProps}
         >
           {pages}
