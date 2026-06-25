@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect, useCallback, forwardRef } from 'react';
+import { useRef, useState, useEffect, useCallback, forwardRef, memo } from 'react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import { useCatalogPageLoader } from '../hooks/useCatalogPageLoader';
 import HTMLFlipBook from 'react-pageflip';
 import { useSearchParams } from 'react-router-dom';
 import type { PageDimensions } from '../types';
-import { assetUrl } from '../utils/assets';
 
 export interface FlipBookRef {
   pageFlip(): {
@@ -40,19 +40,58 @@ interface PageProps {
   alt: string;
   width: number;
   height: number;
+  shouldLoad: boolean;
+  highPriority: boolean;
+  onLoaded: () => void;
 }
 
-const Page = forwardRef<HTMLDivElement, PageProps>(({ src, alt, width, height }, ref) => (
-  <div ref={ref} className="page bg-white flex items-center justify-center overflow-hidden">
-    <img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      style={{ aspectRatio: `${width} / ${height}` }}
-      className="max-w-full max-h-full object-scale-down"
-    />
-  </div>
-));
+const Page = memo(
+  forwardRef<HTMLDivElement, PageProps>(function Page(
+    { src, alt, width, height, shouldLoad, highPriority, onLoaded },
+    ref
+  ) {
+    const [visible, setVisible] = useState(false);
+    const notifiedRef = useRef(false);
+
+    useEffect(() => {
+      notifiedRef.current = false;
+      setVisible(false);
+    }, [src]);
+
+    useEffect(() => {
+      if (!shouldLoad) return;
+      setVisible(true);
+    }, [shouldLoad]);
+
+    const handleLoad = useCallback(() => {
+      if (notifiedRef.current) return;
+      notifiedRef.current = true;
+      onLoaded();
+    }, [onLoaded]);
+
+    return (
+      <div ref={ref} className="page flex items-center justify-center overflow-hidden bg-white">
+        {visible ? (
+          <img
+            src={src}
+            alt={alt}
+            decoding="async"
+            fetchPriority={highPriority ? 'high' : 'low'}
+            style={{ aspectRatio: `${width} / ${height}` }}
+            className="max-h-full max-w-full object-scale-down"
+            onLoad={handleLoad}
+          />
+        ) : (
+          <div
+            className="h-full w-full animate-pulse bg-mebel-border-muted/40"
+            style={{ aspectRatio: `${width} / ${height}` }}
+            aria-hidden="true"
+          />
+        )}
+      </div>
+    );
+  })
+);
 
 const FlipBookViewer = ({
   images,
@@ -65,9 +104,8 @@ const FlipBookViewer = ({
 }: FlipBookViewerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState<number>(
-    parseInt(searchParams.get('page') || '0')
+    parseInt(searchParams.get('page') || '0', 10)
   );
-  const [ready, setReady] = useState(false);
 
   const bookRef = useRef<FlipBookRef | null>(null);
   const pointerStartX = useRef(0);
@@ -75,6 +113,25 @@ const FlipBookViewer = ({
 
   const resolvedHeight = displayHeight ?? DEFAULT_DISPLAY_HEIGHT;
   const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions, resolvedHeight);
+
+  const { imageUrls, shouldLoadPage, isHighPriorityPage, markPageLoaded, viewerReady } =
+    useCatalogPageLoader({
+      images,
+      currentPage,
+      enabled: true,
+    });
+
+  const bookReadyReportedRef = useRef(false);
+  const initialNavigationDoneRef = useRef(false);
+
+  useEffect(() => {
+    onReadyChange?.(viewerReady);
+  }, [viewerReady, onReadyChange]);
+
+  useEffect(() => {
+    bookReadyReportedRef.current = false;
+    initialNavigationDoneRef.current = false;
+  }, [images, pageWidth, pageHeight, singlePage, isMobile]);
 
   const handleFlip = useCallback(
     (e: { data: unknown }) => {
@@ -108,28 +165,33 @@ const FlipBookViewer = ({
   }, []);
 
   useEffect(() => {
-    onReadyChange?.(false);
+    if (!viewerReady || bookReadyReportedRef.current || !bookRef.current) return;
+
     const timeout = window.setTimeout(() => {
-      setReady(true);
-      onReadyChange?.(true);
+      if (!bookRef.current || bookReadyReportedRef.current) return;
+      bookReadyReportedRef.current = true;
+      onBookReady?.(bookRef.current, currentPage);
     }, 0);
+
     return () => window.clearTimeout(timeout);
-  }, [onReadyChange]);
+  }, [viewerReady, onBookReady]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!viewerReady || initialNavigationDoneRef.current) return;
 
+    const startPage = Number.parseInt(searchParams.get('page') || '0', 10);
     const timeout = window.setTimeout(() => {
       const pageFlip = bookRef.current?.pageFlip();
-      if (pageFlip && currentPage > 0) {
-        pageFlip.turnToPage(currentPage);
+      if (pageFlip && startPage > 0) {
+        pageFlip.turnToPage(startPage);
+        setCurrentPage(startPage);
+        onPageChange?.(startPage);
       }
-      if (bookRef.current) {
-        onBookReady?.(bookRef.current, currentPage);
-      }
-    }, 300);
+      initialNavigationDoneRef.current = true;
+    }, 0);
+
     return () => window.clearTimeout(timeout);
-  }, [ready, currentPage, onBookReady]);
+  }, [viewerReady, searchParams, onPageChange]);
 
   const commonProps = {
     onFlip: handleFlip,
@@ -147,29 +209,24 @@ const FlipBookViewer = ({
     disableFlipByClick: false,
   };
 
-  const pages = images.map((image, index) => (
+  const pages = imageUrls.map((src, index) => (
     <Page
-      key={index}
-      src={assetUrl(image)}
+      key={src}
+      src={src}
       alt={`Page ${index + 1}`}
       width={pageWidth}
       height={pageHeight}
+      shouldLoad={shouldLoadPage(index)}
+      highPriority={isHighPriorityPage(index)}
+      onLoaded={() => markPageLoaded(index)}
     />
   ));
 
-  if (!ready) {
-    return (
-      <div
-        className="relative w-full h-full"
-        style={{ minHeight: pageHeight }}
-        aria-hidden="true"
-      />
-    );
-  }
+  const bookKey = `${isMobile ? 'mobile' : 'desktop'}-${singlePage ? 'single' : 'spread'}`;
 
   return (
     <div
-      className="h-full w-full overflow-hidden flex items-center justify-center touch-pan-y"
+      className="flex h-full w-full touch-none items-center justify-center overflow-hidden"
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onTouchStart={(e) => e.preventDefault()}
@@ -177,7 +234,7 @@ const FlipBookViewer = ({
       {singlePage && !isMobile && (
         <HTMLFlipBook
           ref={bookRef}
-          key={`desktop-${pageWidth}x${pageHeight}-${singlePage}`}
+          key={`${bookKey}-desktop-single`}
           width={pageWidth - 8}
           height={pageHeight}
           size="fixed"
@@ -198,7 +255,7 @@ const FlipBookViewer = ({
       {singlePage && isMobile && (
         <HTMLFlipBook
           ref={bookRef}
-          key={`mobile-${pageWidth}x${pageHeight}-${singlePage}`}
+          key={`${bookKey}-mobile-single`}
           width={pageWidth}
           height={pageHeight}
           size="fixed"
@@ -219,7 +276,7 @@ const FlipBookViewer = ({
       {!singlePage && (
         <HTMLFlipBook
           ref={bookRef}
-          key={`${isMobile ? 'mobile' : 'desktop'}-${pageWidth}x${pageHeight}-${singlePage}`}
+          key={`${bookKey}-spread`}
           width={pageWidth}
           height={pageHeight}
           size="fixed"

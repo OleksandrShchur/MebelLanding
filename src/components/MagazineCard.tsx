@@ -1,5 +1,6 @@
 import type { Magazine } from "../types";
 import { assetUrl } from "../utils/assets";
+import { prefetchMagazinePages } from "../hooks/useCatalogPageLoader";
 
 interface MagazineCardProps {
   magazine: Magazine;
@@ -10,11 +11,19 @@ interface MagazineCardProps {
 const MagazineCard = ({ magazine, onClick, disabled = false }: MagazineCardProps) => {
   const coverImage = magazine.images[0];
 
+  const handlePrefetch = () => {
+    if (!disabled) {
+      prefetchMagazinePages(magazine.images, 3);
+    }
+  };
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
+      onMouseEnter={handlePrefetch}
+      onFocus={handlePrefetch}
       className="group w-full text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mebel-olive disabled:cursor-not-allowed disabled:opacity-60"
       aria-label={`Відкрити каталог ${magazine.name}`}
     >
