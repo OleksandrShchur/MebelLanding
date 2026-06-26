@@ -1,6 +1,9 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
 @theme {
+  --font-family-display: "Cormorant Garamond", serif;
+  --font-family-sans: "Onest", system-ui, sans-serif;
   --color-mebel-olive: #7c5a3a;
   --color-mebel-olive-dark: #6a4c31;
   --color-mebel-olive-darker: #5b544e;
@@ -18,7 +21,7 @@
   --color-mebel-skeleton: #e7ded2;
   --color-mebel-skeleton-muted: #ddd4c8;
   --color-mebel-text: #5b544e;
-  --color-mebel-text-strong: #2f2a25;
+  --color-mebel-text-strong: #4a3e37;
   --color-mebel-text-muted: #7a6f64;
   --color-mebel-text-subtle: #8a827a;
   --shadow-mebel-sm: 0 10px 28px rgba(47, 42, 37, 0.06);
@@ -29,6 +32,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  font-family: 'Onest', sans-serif;
   background-color: var(--color-mebel-cream);
   color: var(--color-mebel-text);
 }

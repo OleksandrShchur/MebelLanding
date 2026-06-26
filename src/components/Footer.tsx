@@ -4,13 +4,13 @@ import { FaFacebook, FaWhatsapp, FaViber } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer id="footer" className="bg-white py-8 border-t border-mebel-border">
+    <footer id="footer" className="font-sans bg-white py-8 border-t border-mebel-border">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16 lg:gap-32 justify-items-center md:justify-items-start">
           {/* Column 1 */}
           <div className="w-full">
-            <h3 className="text-lg md:text-xl font-bold mb-4 text-mebel-text-strong">Магазин Mebel</h3>
-            <p className="text-sm md:text-base text-mebel-text">
+            <h3 className="font-display text-lg md:text-xl font-bold mb-4 text-mebel-text-strong">Магазин Mebel</h3>
+            <p className="font-sans text-sm md:text-base text-mebel-text">
               Ваше найкраще місце для придбання високоякісних меблів.
               Ми пропонуємо широкий асортимент шаф, диванів та кухонних рішень, щоб зробити ваш дім красивим та функціональним.
             </p>
@@ -18,7 +18,7 @@ const Footer = () => {
 
           {/* Column 2 — Contact + Map */}
           <div className="w-full">
-            <h3 className="text-lg md:text-xl font-bold mb-4 text-mebel-text-strong">Зв'яжіться з нами</h3>
+            <h3 className="font-display text-lg md:text-xl font-bold mb-4 text-mebel-text-strong">Зв'яжіться з нами</h3>
             <div className="flex items-center gap-2 text-mebel-text mb-2">
               <Phone size={16} className="text-mebel-tan shrink-0" />
               <span className="text-sm md:text-base">+1 (555) 123-4567</span>
@@ -48,7 +48,7 @@ const Footer = () => {
 
           {/* Column 3 */}
           <div className="w-full">
-            <h3 className="text-lg md:text-xl font-bold mb-4 text-mebel-text-strong">Соціальні мережі</h3>
+            <h3 className="font-display text-lg md:text-xl font-bold mb-4 text-mebel-text-strong">Соціальні мережі</h3>
             <div className="flex flex-col space-y-3">
               <a href="#" className="flex items-center gap-2 text-mebel-text hover:text-mebel-text-strong transition-colors">
                 <FaFacebook size={18} className="text-[#1877F2]" />
