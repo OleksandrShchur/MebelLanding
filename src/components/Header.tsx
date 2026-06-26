@@ -185,6 +185,7 @@ const Header = () => {
             {navItems.map(({ id, label, Icon }) => (
               <button
                 key={id}
+                type="button"
                 onClick={() => handleNavClick(id)}
                 className="nav-btn group flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent text-mebel-text hover:text-mebel-text-strong hover:bg-mebel-hover transition-all duration-200"
               >
@@ -210,63 +211,62 @@ const Header = () => {
 
         <AnimatePresence>
           {isMenuOpen && (
-            <motion.div
-              key="mobile-menu"
-              className={`md:hidden fixed inset-x-0 z-40 overflow-hidden bg-white shadow-xl ${headerHeight ? '' : 'top-14'}`}
-              style={{ top: headerHeight ? `${headerHeight}px` : undefined }}
-              initial={prefersReducedMotion ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={prefersReducedMotion ? { height: 'auto', opacity: 0 } : { height: 0, opacity: 0 }}
-              transition={menuPanelTransition}
-            >
-              <div className="h-0.5 bg-gradient-to-r from-mebel-olive via-mebel-warm to-transparent" />
+            <>
+              <motion.div
+                key="mobile-backdrop"
+                className={`md:hidden fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px] ${headerHeight ? '' : 'top-14'}`}
+                style={{ top: headerHeight ? `${headerHeight}px` : undefined }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={menuPanelTransition}
+                onClick={() => setIsMenuOpen(false)}
+              />
 
               <motion.div
-                className="px-4 py-4 space-y-2"
-                variants={prefersReducedMotion ? undefined : menuContainer}
-                initial="hidden"
-                animate="show"
+                key="mobile-menu"
+                className={`md:hidden fixed inset-x-0 z-40 bg-white shadow-xl ${headerHeight ? '' : 'top-14'}`}
+                style={{ top: headerHeight ? `${headerHeight}px` : undefined }}
+                initial={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={prefersReducedMotion ? { opacity: 0, y: 0 } : { opacity: 0, y: -8 }}
+                transition={menuPanelTransition}
               >
-                {navItems.map(({ id, label, Icon }) => (
-                  <motion.button
-                    key={id}
-                    variants={prefersReducedMotion ? reducedMenuItem : menuItem}
-                    onClick={() => handleNavClick(id)}
-                    className="nav-btn group flex items-center gap-3 w-full text-left px-4 py-3.5 rounded-xl bg-mebel-olive text-white font-medium hover:bg-mebel-olive-dark active:scale-[0.98] transition-all duration-150"
-                  >
-                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/15 group-hover:bg-white/25 transition-colors shrink-0 text-white">
-                      <Icon />
-                    </span>
-                    <span className="text-sm tracking-wide">{label}</span>
-                    <svg
-                      className="ml-auto w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                <div className="h-0.5 bg-gradient-to-r from-mebel-olive via-mebel-warm to-transparent" />
+
+                <motion.div
+                  className="px-4 py-4 space-y-2"
+                  variants={prefersReducedMotion ? undefined : menuContainer}
+                  initial="hidden"
+                  animate="show"
+                >
+                  {navItems.map(({ id, label, Icon }) => (
+                    <motion.button
+                      key={id}
+                      type="button"
+                      variants={prefersReducedMotion ? reducedMenuItem : menuItem}
+                      onClick={() => handleNavClick(id)}
+                      className="nav-btn group flex items-center gap-3 w-full text-left px-4 py-3.5 rounded-xl bg-mebel-olive text-white font-medium hover:bg-mebel-olive-dark active:scale-[0.98] transition-all duration-150"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 18l6-6-6-6" />
-                    </svg>
-                  </motion.button>
-                ))}
+                      <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/15 group-hover:bg-white/25 transition-colors shrink-0 text-white">
+                        <Icon />
+                      </span>
+                      <span className="text-sm tracking-wide">{label}</span>
+                      <svg
+                        className="ml-auto w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 18l6-6-6-6" />
+                      </svg>
+                    </motion.button>
+                  ))}
+                </motion.div>
+
+                <div className="h-2" />
               </motion.div>
-
-              <div className="h-2" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              key="mobile-backdrop"
-              className={`md:hidden fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px] ${headerHeight ? '' : 'top-14'}`}
-              style={{ top: headerHeight ? `${headerHeight}px` : undefined }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={menuPanelTransition}
-              onClick={() => setIsMenuOpen(false)}
-            />
+            </>
           )}
         </AnimatePresence>
       </header>
