@@ -30,7 +30,7 @@ const LoadingSpinner = ({
           <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-mebel-olive border-r-mebel-olive animate-spin" />
           <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-mebel-olive" />
         </div>
-        <span className="text-sm font-medium tracking-[0.18em] uppercase text-mebel-text-muted">
+        <span className="font-sans text-sm font-medium tracking-[0.18em] uppercase text-mebel-text-muted">
           {label}
         </span>
       </div>

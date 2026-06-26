@@ -64,13 +64,13 @@ const HeroCarousel = () => {
         >
           <motion.h1
             variants={prefersReducedMotion ? instantItem : item}
-            className="hero-title mb-4 max-w-3xl text-white drop-shadow-lg"
+            className="hero-title font-display mb-4 max-w-3xl text-white drop-shadow-lg"
           >
             Якісні меблі для вашого дому
           </motion.h1>
           <motion.p
             variants={prefersReducedMotion ? instantItem : item}
-            className="mb-8 max-w-xl text-base text-mebel-cream/95 drop-shadow-md md:text-lg"
+            className="font-sans mb-8 max-w-xl text-base text-mebel-cream/95 drop-shadow-md md:text-lg"
           >
             Переглядайте каталоги меблів онлайн та обирайте ідеальні рішення для кожної кімнати.
           </motion.p>
@@ -78,7 +78,7 @@ const HeroCarousel = () => {
             type="button"
             variants={prefersReducedMotion ? instantItem : item}
             onClick={scrollToCategories}
-            className="nav-btn rounded-full bg-mebel-olive px-6 py-3 text-sm font-semibold text-white shadow-mebel-md transition-colors hover:bg-mebel-olive-dark md:text-base"
+            className="nav-btn font-sans rounded-full bg-mebel-olive px-6 py-3 text-sm font-semibold text-white shadow-mebel-md transition-colors hover:bg-mebel-olive-dark md:text-base"
           >
             Переглянути каталоги
           </motion.button>

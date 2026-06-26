@@ -176,7 +176,7 @@ const Header = () => {
         }`}
       >
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-          <h1 className="text-xl md:text-2xl font-bold text-mebel-text-strong">
+          <h1 className="font-display text-xl md:text-2xl font-bold text-mebel-text-strong">
             <button
               type="button"
               onClick={() => handleNavClick('hero')}
@@ -199,7 +199,7 @@ const Header = () => {
                 <span className="flex items-center justify-center w-6 h-6 rounded-md bg-mebel-olive/15 group-hover:bg-mebel-olive/20 transition-colors text-current">
                   <Icon />
                 </span>
-                <span className="text-sm font-medium">{label}</span>
+                <span className="font-sans text-sm font-medium">{label}</span>
               </button>
             ))}
           </nav>
@@ -258,7 +258,7 @@ const Header = () => {
                       <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/15 group-hover:bg-white/25 transition-colors shrink-0 text-white">
                         <Icon />
                       </span>
-                      <span className="text-sm tracking-wide">{label}</span>
+                      <span className="font-sans text-sm tracking-wide">{label}</span>
                       <svg
                         className="ml-auto w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
                         fill="none"

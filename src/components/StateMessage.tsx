@@ -29,8 +29,8 @@ const StateMessage = ({
       aria-live={tone === 'error' ? 'assertive' : 'polite'}
     >
       <div className="mx-auto max-w-2xl">
-        <h3 className="text-lg font-semibold text-current">{title}</h3>
-        <p className="mt-2 text-sm leading-6 text-current md:text-base">{description}</p>
+        <h3 className="font-display text-lg font-semibold text-current">{title}</h3>
+        <p className="font-sans mt-2 text-sm leading-6 text-current md:text-base">{description}</p>
         {action ? <div className="mt-4">{action}</div> : null}
       </div>
     </div>

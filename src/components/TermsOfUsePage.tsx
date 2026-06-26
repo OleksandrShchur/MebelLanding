@@ -16,13 +16,13 @@ const TermsOfUsePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-mebel-cream text-mebel-text-strong">
+        <div className="font-sans min-h-screen bg-mebel-cream text-mebel-text-strong">
             <section className="border-b border-mebel-border bg-gradient-to-b from-mebel-surface to-mebel-cream">
                 <div className="max-w-5xl mx-auto px-6 md:px-10 py-16 md:py-24">
                     <p className="text-sm uppercase tracking-[0.2em] text-mebel-accent mb-4">
                         Mebel Landing
                     </p>
-                    <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-6">
+                    <h1 className="font-display text-4xl md:text-5xl font-semibold leading-tight mb-6">
                         Умови використання сайту
                     </h1>
                     <p className="max-w-3xl text-base md:text-lg leading-8 text-mebel-text">
@@ -37,7 +37,7 @@ const TermsOfUsePage = () => {
                 <div className="max-w-5xl mx-auto px-6 md:px-10 py-12 md:py-16">
                     <div className="bg-white/80 backdrop-blur-sm border border-mebel-border rounded-3xl shadow-mebel-card p-6 md:p-10 space-y-10">
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">1. Загальні положення</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">1. Загальні положення</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     1.1. Користуючись цим сайтом, ви підтверджуєте, що ознайомилися
@@ -58,7 +58,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">2. Використання матеріалів сайту</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">2. Використання матеріалів сайту</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     2.1. Уся інформація, тексти, зображення, елементи дизайну,
@@ -81,7 +81,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">3. Інформація про товари та послуги</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">3. Інформація про товари та послуги</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     3.1. Інформація про товари, їх характеристики, комплектацію,
@@ -102,7 +102,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">4. Поведінка користувача</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">4. Поведінка користувача</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     4.1. Користувач зобов’язується не використовувати сайт для
@@ -123,7 +123,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">5. Форми зворотного зв’язку та комунікація</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">5. Форми зворотного зв’язку та комунікація</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     5.1. Надсилаючи повідомлення через форми сайту, користувач
@@ -144,7 +144,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">6. Обмеження відповідальності</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">6. Обмеження відповідальності</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     6.1. Сайт надається на умовах «як є». Адміністрація не гарантує,
@@ -165,7 +165,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">7. Посилання на сторонні ресурси</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">7. Посилання на сторонні ресурси</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     7.1. Сайт може містити посилання на сторонні вебресурси для
@@ -180,7 +180,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">8. Захист персональних даних</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">8. Захист персональних даних</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     8.1. Обробка персональних даних користувачів здійснюється
@@ -197,7 +197,7 @@ const TermsOfUsePage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">9. Прикінцеві положення</h2>
+                            <h2 className="font-display text-2xl font-semibold mb-4">9. Прикінцеві положення</h2>
                             <div className="space-y-4 text-mebel-text-strong leading-8">
                                 <p>
                                     9.1. До цих умов використання застосовується чинне законодавство

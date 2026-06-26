@@ -47,12 +47,12 @@ const SectionShell = ({
           >
             <h2
               id={headingId}
-              className="text-2xl font-bold text-mebel-text-strong md:text-3xl"
+              className="font-display text-2xl font-bold text-mebel-text-strong md:text-3xl"
             >
               {title}
             </h2>
             {description ? (
-              <p id={descriptionId} className="mt-2 text-sm leading-6 text-mebel-text-muted md:text-base">
+              <p id={descriptionId} className="font-sans mt-2 text-sm leading-6 text-mebel-text-muted md:text-base">
                 {description}
               </p>
             ) : null}
