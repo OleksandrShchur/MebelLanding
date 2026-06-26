@@ -176,9 +176,16 @@ const Header = () => {
         }`}
       >
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-          <h1 className="flex items-center text-xl md:text-2xl font-bold text-mebel-text-strong">
-            <SofaIcon />
-            Магазин Mebel
+          <h1 className="text-xl md:text-2xl font-bold text-mebel-text-strong">
+            <button
+              type="button"
+              onClick={() => handleNavClick('hero')}
+              className="nav-btn flex items-center rounded-lg px-1 py-0.5 -ml-1 text-mebel-text-strong hover:text-mebel-text-strong hover:bg-mebel-hover transition-all duration-200"
+              aria-label="Головна"
+            >
+              <SofaIcon />
+              Магазин Mebel
+            </button>
           </h1>
 
           <nav className="hidden md:flex space-x-1">
