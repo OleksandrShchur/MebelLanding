@@ -3,12 +3,14 @@ import Layout from './components/Layout';
 import Home from './components/Home';
 import TermsOfUsePage from './components/TermsOfUsePage';
 
+const homeElement = <Home />;
+
 function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Home key="home" />} />
-        <Route path="/catalog/:category/:magazineId" element={<Home key="modal" />} />
+        <Route path="/" element={homeElement} />
+        <Route path="/catalog/:category/:magazineId" element={homeElement} />
         <Route path="/terms" element={<TermsOfUsePage />} />
       </Routes>
     </Layout>

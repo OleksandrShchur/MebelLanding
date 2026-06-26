@@ -9,10 +9,18 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+function getPageTransitionKey(pathname: string): string {
+  if (pathname === '/' || /^\/catalog\/[^/]+\/[^/]+$/.test(pathname)) {
+    return 'home';
+  }
+  return pathname;
+}
+
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const isModalOpen = location.pathname.includes('/catalog/');
+  const pageKey = getPageTransitionKey(location.pathname);
 
   const instant = { opacity: 1, y: 0 };
   const pageTransition = prefersReducedMotion
@@ -24,7 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Header />
       <AnimatePresence mode="wait">
         <motion.div
-          key={location.pathname}
+          key={pageKey}
           initial={prefersReducedMotion ? instant : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={prefersReducedMotion ? instant : { opacity: 0, y: -8 }}
