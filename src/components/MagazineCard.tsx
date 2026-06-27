@@ -1,5 +1,5 @@
 import type { Magazine } from "../types";
-import { assetUrl } from "../utils/assets";
+import { assetUrl, catalogImageUrl } from "../utils/assets";
 import { prefetchMagazinePages } from "../hooks/useCatalogPageLoader";
 
 interface MagazineCardProps {
@@ -30,7 +30,7 @@ const MagazineCard = ({ magazine, onClick, disabled = false }: MagazineCardProps
       <div className="overflow-hidden rounded-[26px] border border-mebel-border-muted bg-mebel-surface-raised p-0 shadow-mebel-md transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:border-mebel-tan group-hover:shadow-mebel-md group-active:translate-y-0 group-active:scale-[0.985] group-disabled:hover:translate-y-0 group-disabled:hover:shadow-mebel-md group-disabled:active:scale-100">
         <div className="m-2 mb-0 overflow-hidden rounded-[22px] border border-mebel-border-muted bg-gradient-to-b from-mebel-surface-raised to-mebel-cream">
           <img
-            src={coverImage ? assetUrl(coverImage) : assetUrl('images/top/1.jpg')}
+            src={coverImage ? catalogImageUrl(coverImage) : assetUrl('images/top/1.jpg')}
             alt={magazine.name}
             className="h-64 w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035]"
             loading="lazy"
