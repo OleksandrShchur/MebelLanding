@@ -1,6 +1,4 @@
 import type { ReactNode } from 'react';
-import { motion } from 'framer-motion';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface SectionShellProps {
   id?: string;
@@ -21,13 +19,8 @@ const SectionShell = ({
   className = '',
   contentClassName = '',
 }: SectionShellProps) => {
-  const prefersReducedMotion = useReducedMotion();
   const headingId = id ? `${id}-heading` : undefined;
   const descriptionId = id && description ? `${id}-description` : undefined;
-
-  const headerTransition = prefersReducedMotion
-    ? { duration: 0 }
-    : { type: 'spring' as const, stiffness: 240, damping: 24 };
 
   return (
     <section
@@ -38,13 +31,7 @@ const SectionShell = ({
     >
       <div className="container mx-auto px-4">
         <div className="mb-6 flex flex-col gap-3 md:mb-10 md:flex-row md:items-end md:justify-between">
-          <motion.div
-            className="max-w-3xl"
-            initial={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={headerTransition}
-          >
+          <div className="max-w-3xl">
             <h2
               id={headingId}
               className="font-display text-2xl font-bold text-mebel-text-strong md:text-3xl"
@@ -56,7 +43,7 @@ const SectionShell = ({
                 {description}
               </p>
             ) : null}
-          </motion.div>
+          </div>
           {titleAction ? <div className="shrink-0">{titleAction}</div> : null}
         </div>
 

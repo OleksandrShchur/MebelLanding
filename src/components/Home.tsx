@@ -10,6 +10,8 @@ import type { Category, CategoryItem, CategorySectionViewModel, Magazine } from 
 import { categories } from '../data/categories';
 import { assetUrl } from '../utils/assets';
 
+const catalogLoadingItems = Array.from({ length: 4 }, (_, index) => index);
+
 function Home() {
   const { data, loading, error, retry, status } = useGallery();
   const { category: categoryParam, magazineId: magazineIdParam } = useParams<{
@@ -48,10 +50,10 @@ function Home() {
 
   const selectedMagazine =
     data &&
-    categoryParam &&
-    magazineIdParam &&
-    isValidCategory(categoryParam) &&
-    isValidId(magazineIdParam)
+      categoryParam &&
+      magazineIdParam &&
+      isValidCategory(categoryParam) &&
+      isValidId(magazineIdParam)
       ? findMagazineByCategoryAndId(data, categoryParam, Number.parseInt(magazineIdParam, 10))
       : null;
   const isModalOpen = !!selectedMagazine;
@@ -83,35 +85,43 @@ function Home() {
     }
   }, [hasInvalidRouteParams, hasMissingMagazine, loading, navigate]);
 
-  if (loading) {
-    return (
-      <>
-        <HeroCarousel />
-        <CategoriesGrid items={categoryItems} onSelect={handleCategoryClick} loading />
-        {categories.map((category) => (
-          <CategorySection
-            key={category.id}
-            category={category.id}
-            title={category.name}
-            magazines={[]}
-            onMagazineClick={handleMagazineClick}
-            loading
-          />
-        ))}
-      </>
-    );
-  }
+  return (
+    <>
+      <HeroCarousel />
+      <CategoriesGrid
+        items={categoryItems}
+        onSelect={handleCategoryClick}
+        error={error}
+        onRetry={retry}
+        emptyStateDescription="Список категорій порожній. Додайте дані до маніфесту каталогу, щоб заповнити секцію."
+      />
 
-  if (error) {
-    return (
-      <>
-        <HeroCarousel />
-        <CategoriesGrid
-          items={categoryItems}
-          onSelect={handleCategoryClick}
-          error={error}
-          onRetry={retry}
-        />
+      {loading ? (
+        <section className="bg-mebel-cream py-10 md:py-16" aria-label="Завантаження каталогів" aria-busy="true">
+          <div className="container mx-auto px-4">
+            <div className="mb-6 md:mb-10">
+              <div className="h-8 w-48 animate-pulse rounded bg-mebel-skeleton md:h-9" />
+              <div className="mt-2 h-4 w-full max-w-xl animate-pulse rounded bg-mebel-skeleton-muted" />
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {catalogLoadingItems.map((item) => (
+                <div
+                  key={item}
+                  className="overflow-hidden rounded-2xl border border-mebel-border bg-white shadow-sm"
+                  aria-hidden="true"
+                >
+                  <div className="h-64 animate-pulse bg-mebel-skeleton" />
+                  <div className="p-4">
+                    <div className="mx-auto h-4 w-2/3 animate-pulse rounded bg-mebel-skeleton" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {!loading && error ? (
         <section className="bg-mebel-cream px-4 pb-16">
           <div className="container mx-auto">
             <StateMessage
@@ -126,21 +136,10 @@ function Home() {
             />
           </div>
         </section>
-      </>
-    );
-  }
+      ) : null}
 
-  return (
-    <>
-      <HeroCarousel />
-      <CategoriesGrid
-        items={categoryItems}
-        onSelect={handleCategoryClick}
-        emptyStateDescription="Список категорій порожній. Додайте дані до маніфесту каталогу, щоб заповнити секцію."
-      />
-
-      {hasAnyCatalogs ? (
-        sections.map((section) => (
+      {!loading && !error && hasAnyCatalogs
+        ? sections.map((section) => (
           <CategorySection
             key={section.category}
             category={section.category}
@@ -150,21 +149,24 @@ function Home() {
             missing={section.missing}
           />
         ))
-      ) : (
-        <section className="bg-mebel-cream px-4 pb-16">
-          <div className="container mx-auto">
-            <StateMessage
-              title="Каталоги ще наповнюються"
-              description="Ми підготували структуру категорій, але поки не знайшли жодного доступного каталогу для відображення."
-              action={
-                <button type="button" onClick={retry}>
-                  Перевірити ще раз
-                </button>
-              }
-            />
-          </div>
-        </section>
-      )}
+        : null}
+
+      {!loading && !error && !hasAnyCatalogs
+        ? (
+          <section className="bg-mebel-cream px-4 pb-16">
+            <div className="container mx-auto">
+              <StateMessage
+                title="Каталоги ще наповнюються"
+                description="Ми підготували структуру категорій, але поки не знайшли жодного доступного каталогу для відображення."
+                action={
+                  <button type="button" onClick={retry}>
+                    Перевірити ще раз
+                  </button>
+                }
+              />
+            </div>
+          </section>
+        ) : null}
 
       <MagazineModal
         magazine={selectedMagazine}

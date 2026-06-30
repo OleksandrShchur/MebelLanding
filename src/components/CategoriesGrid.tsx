@@ -1,6 +1,4 @@
-import { motion } from 'framer-motion';
 import type { Category, CategoryItem } from '../types';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import SectionShell from './SectionShell';
 import StateMessage from './StateMessage';
 
@@ -18,20 +16,6 @@ interface CategoriesGridProps {
 
 const skeletonItems = Array.from({ length: 6 }, (_, index) => index);
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.06,
-      type: 'spring' as const,
-      stiffness: 260,
-      damping: 24,
-    },
-  }),
-};
-
 const CategoriesGrid = ({
   title = 'Наші категорії',
   description = 'Оберіть категорію, щоб швидко перейти до відповідного каталогу меблів.',
@@ -43,13 +27,7 @@ const CategoriesGrid = ({
   emptyStateTitle = 'Категорії тимчасово недоступні',
   emptyStateDescription = 'Спробуйте оновити сторінку трохи пізніше або повторіть запит ще раз.',
 }: CategoriesGridProps) => {
-  const prefersReducedMotion = useReducedMotion();
   const hasItems = items.length > 0;
-
-  const reducedVariants = {
-    hidden: { opacity: 1, y: 0 },
-    visible: () => ({ opacity: 1, y: 0, transition: { duration: 0 } }),
-  };
 
   return (
     <SectionShell
@@ -108,15 +86,7 @@ const CategoriesGrid = ({
       {!loading && !error && hasItems ? (
         <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-6">
           {items.map((category, index) => (
-            <motion.div
-              key={category.id}
-              className="h-full"
-              custom={index}
-              variants={prefersReducedMotion ? reducedVariants : cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-60px' }}
-            >
+            <div key={category.id} className="h-full">
               <button
                 type="button"
                 onClick={() => onSelect(category.id)}
@@ -130,7 +100,8 @@ const CategoriesGrid = ({
                       src={category.imageSrc}
                       alt={category.imageAlt ?? category.name}
                       className="max-h-24 w-full object-contain opacity-95 transition duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] group-hover:opacity-100 md:max-h-36"
-                      loading="lazy"
+                      loading="eager"
+                      fetchPriority={index < 4 ? 'high' : 'auto'}
                     />
                   </div>
                   <div className="flex min-h-16 shrink-0 items-center justify-center px-2 pb-2 pt-4 text-center md:px-3 md:pb-3 md:pt-5">
@@ -140,7 +111,7 @@ const CategoriesGrid = ({
                   </div>
                 </div>
               </button>
-            </motion.div>
+            </div>
           ))}
         </div>
       ) : null}

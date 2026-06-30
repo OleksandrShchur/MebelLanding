@@ -1,8 +1,6 @@
-import { motion } from 'framer-motion';
 import type { Category, Magazine } from '../types';
 import MagazineCard from './MagazineCard';
 import { categories } from '../data/categories';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import SectionShell from './SectionShell';
 import StateMessage from './StateMessage';
 
@@ -17,20 +15,6 @@ interface CategorySectionProps {
 
 const loadingItems = Array.from({ length: 4 }, (_, index) => index);
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.05,
-      type: 'spring' as const,
-      stiffness: 260,
-      damping: 24,
-    },
-  }),
-};
-
 const CategorySection = ({
   category,
   title,
@@ -39,15 +23,9 @@ const CategorySection = ({
   loading = false,
   missing = false,
 }: CategorySectionProps) => {
-  const prefersReducedMotion = useReducedMotion();
   const categoryData = categories.find((cat) => cat.id === category);
   const categoryName = title ?? (categoryData ? categoryData.name : category);
   const isEmpty = magazines.length === 0;
-
-  const reducedVariants = {
-    hidden: { opacity: 1, y: 0 },
-    visible: () => ({ opacity: 1, y: 0, transition: { duration: 0 } }),
-  };
 
   return (
     <SectionShell
@@ -91,20 +69,13 @@ const CategorySection = ({
 
       {!loading && !missing && !isEmpty ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {magazines.map((magazine, index) => (
-            <motion.div
-              key={magazine.id}
-              custom={index}
-              variants={prefersReducedMotion ? reducedVariants : cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-60px' }}
-            >
+          {magazines.map((magazine) => (
+            <div key={magazine.id}>
               <MagazineCard
                 magazine={magazine}
                 onClick={() => onMagazineClick(magazine, category, 0)}
               />
-            </motion.div>
+            </div>
           ))}
         </div>
       ) : null}
