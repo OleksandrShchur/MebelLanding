@@ -22,6 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Generated catalog WebP thumbnails (vite-plugin catalog-images)
-public/**/*.catalog.webp
+public/images/catalogs
+scripts/__pycache__
