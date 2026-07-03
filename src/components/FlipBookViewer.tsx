@@ -27,6 +27,12 @@ interface FlipBookViewerProps {
 
 const DEFAULT_DISPLAY_HEIGHT = 600;
 
+function parsePageIndex(value: string | null, totalPages: number): number {
+  const parsed = Number.parseInt(value || '0', 10);
+  if (Number.isNaN(parsed) || totalPages <= 0) return 0;
+  return Math.max(0, Math.min(parsed, totalPages - 1));
+}
+
 function getPageSlotDimensions(pageDimensions: PageDimensions, displayHeight: number) {
   const scale = displayHeight / pageDimensions.height;
   return {
@@ -103,9 +109,8 @@ const FlipBookViewer = ({
   onPageChange,
 }: FlipBookViewerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState<number>(
-    parseInt(searchParams.get('page') || '0', 10)
-  );
+  const urlPage = parsePageIndex(searchParams.get('page'), images.length);
+  const [currentPage, setCurrentPage] = useState<number>(urlPage);
 
   const bookRef = useRef<FlipBookRef | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -121,7 +126,10 @@ const FlipBookViewer = ({
     });
 
   const bookReadyReportedRef = useRef(false);
-  const initialNavigationDoneRef = useRef(false);
+
+  useEffect(() => {
+    setCurrentPage(urlPage);
+  }, [urlPage]);
 
   useEffect(() => {
     onReadyChange?.(viewerReady);
@@ -129,7 +137,6 @@ const FlipBookViewer = ({
 
   useEffect(() => {
     bookReadyReportedRef.current = false;
-    initialNavigationDoneRef.current = false;
   }, [images, pageWidth, pageHeight, singlePage, isMobile]);
 
   const handleFlip = useCallback(
@@ -145,38 +152,35 @@ const FlipBookViewer = ({
   );
 
   useEffect(() => {
-    if (!viewerReady || bookReadyReportedRef.current || !bookRef.current) return;
+    if (!viewerReady || bookReadyReportedRef.current) return;
 
-    const timeout = window.setTimeout(() => {
-      if (!bookRef.current || bookReadyReportedRef.current) return;
-      bookReadyReportedRef.current = true;
-      onBookReady?.(bookRef.current, currentPage);
-    }, 0);
+    let cancelled = false;
+    let frameId = 0;
 
-    return () => window.clearTimeout(timeout);
-  }, [viewerReady, onBookReady]);
+    const reportWhenReady = () => {
+      if (cancelled || bookReadyReportedRef.current) return;
 
-  useEffect(() => {
-    if (!viewerReady || initialNavigationDoneRef.current) return;
-
-    const startPage = Number.parseInt(searchParams.get('page') || '0', 10);
-    const timeout = window.setTimeout(() => {
-      const pageFlip = bookRef.current?.pageFlip();
-      if (pageFlip && startPage > 0) {
-        pageFlip.turnToPage(startPage);
-        setCurrentPage(startPage);
-        onPageChange?.(startPage);
+      if (bookRef.current) {
+        bookReadyReportedRef.current = true;
+        onBookReady?.(bookRef.current, currentPage);
+        return;
       }
-      initialNavigationDoneRef.current = true;
-    }, 0);
 
-    return () => window.clearTimeout(timeout);
-  }, [viewerReady, searchParams, onPageChange]);
+      frameId = window.requestAnimationFrame(reportWhenReady);
+    };
+
+    frameId = window.requestAnimationFrame(reportWhenReady);
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [viewerReady, onBookReady, currentPage]);
 
   const commonProps = {
     onFlip: handleFlip,
     className: 'flip-book',
-    startPage: 0,
+    startPage: urlPage,
     flippingTime: 1000,
     startZIndex: 0,
     maxShadowOpacity: 1,

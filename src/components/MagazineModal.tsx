@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import LoadingSpinner from './LoadingSpinner';
-import { prefetchMagazinePages } from '../hooks/useCatalogPageLoader';
+import { prefetchMagazinePagesAround } from '../hooks/useCatalogPageLoader';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import ToggleButton from 'react-toggle-button';
@@ -131,8 +131,9 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   useEffect(() => {
     if (!isOpen || !magazine) return;
     flipRef.current = null;
-    setCurrentPage(parsePageIndex(searchParams.get('page')));
-    prefetchMagazinePages(magazine.images, 3);
+    const pageIndex = parsePageIndex(searchParams.get('page'));
+    setCurrentPage(pageIndex);
+    prefetchMagazinePagesAround(magazine.images, pageIndex);
   }, [isOpen, magazine]);
 
   useEffect(() => {
