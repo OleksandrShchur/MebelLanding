@@ -429,26 +429,6 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              <button
-                type="button"
-                onClick={goToPrevPage}
-                disabled={!canGoPrev}
-                className={`absolute top-1/2 left-1 z-20 -translate-y-1/2 ${navButtonClass(isMobile)}`}
-                aria-label="Попередня сторінка"
-              >
-                <ChevronLeft className={navIconClass(isMobile)} aria-hidden="true" />
-              </button>
-
-              <button
-                type="button"
-                onClick={goToNextPage}
-                disabled={!canGoNext}
-                className={`absolute top-1/2 right-1 z-20 -translate-y-1/2 ${navButtonClass(isMobile)}`}
-                aria-label="Наступна сторінка"
-              >
-                <ChevronRight className={navIconClass(isMobile)} aria-hidden="true" />
-              </button>
             </div>
 
             {/* Bottom bar — prev/next + toggle */}
