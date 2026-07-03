@@ -160,3 +160,15 @@ export function prefetchMagazinePages(images: string[], count = 3): void {
     void preloadImage(catalogImageUrl(image), index === 0 ? 'high' : 'low');
   });
 }
+
+export function prefetchMagazinePagesAround(images: string[], centerPage: number): void {
+  if (images.length === 0) return;
+
+  const { high, low } = getLoadIndices(centerPage, images.length);
+  high.forEach((index) => {
+    void preloadImage(catalogImageUrl(images[index]), 'high');
+  });
+  low.forEach((index) => {
+    void preloadImage(catalogImageUrl(images[index]), 'low');
+  });
+}
