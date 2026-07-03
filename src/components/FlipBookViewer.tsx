@@ -152,17 +152,22 @@ const FlipBookViewer = ({
     }
   }, []);
 
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    const delta = e.clientX - pointerStartX.current;
-    const pageFlip = bookRef.current?.pageFlip();
-    if (!pageFlip) return;
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (isMobile) return;
 
-    if (delta > 60) {
-      pageFlip.flipNext();
-    } else if (delta < -60) {
-      pageFlip.flipPrev();
-    }
-  }, []);
+      const delta = e.clientX - pointerStartX.current;
+      const pageFlip = bookRef.current?.pageFlip();
+      if (!pageFlip) return;
+
+      if (delta > 60) {
+        pageFlip.flipNext();
+      } else if (delta < -60) {
+        pageFlip.flipPrev();
+      }
+    },
+    [isMobile]
+  );
 
   useEffect(() => {
     if (!viewerReady || bookReadyReportedRef.current || !bookRef.current) return;
@@ -203,10 +208,10 @@ const FlipBookViewer = ({
     showCover: false,
     mobileScrollSupport: false,
     clickEventForward: true,
-    useMouseEvents: true,
+    useMouseEvents: !isMobile,
     swipeDistance: 30,
     showPageCorners: false,
-    disableFlipByClick: false,
+    disableFlipByClick: isMobile,
   };
 
   const pages = imageUrls.map((src, index) => (
