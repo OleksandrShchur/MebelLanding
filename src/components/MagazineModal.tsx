@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
@@ -20,6 +20,11 @@ const PADDING = 8;
 const HEADER_FALLBACK = 72;
 const FOOTER_FALLBACK = 80;
 const BOOK_HORIZONTAL_PADDING = 16;
+
+const navButtonClass = (isMobile: boolean) =>
+  `rounded-full bg-mebel-olive text-white shadow-md transition-all hover:bg-mebel-olive-dark disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-mebel-olive ${isMobile ? 'p-2' : 'p-3'}`;
+
+const navIconClass = (isMobile: boolean) => (isMobile ? 'h-4 w-4' : 'h-5 w-5');
 
 function fitBookSize(
   magazine: Magazine,
@@ -148,26 +153,6 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     return () => observer.disconnect();
   }, [isOpen, isFullscreen, isMobile, singlePage, magazine]);
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isFullscreen) {
-          setIsFullscreen(false);
-        } else {
-          onClose();
-        }
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, isFullscreen, onClose]);
-
   const handleBookReady = useCallback((ref: FlipBookRef, pageIndex: number) => {
     flipRef.current = ref;
     setCurrentPage(pageIndex);
@@ -191,6 +176,51 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   );
 
   const totalPages = magazine?.images.length ?? 0;
+  const canGoPrev = viewerReady && currentPage > 0;
+  const canGoNext = viewerReady && totalPages > 0 && currentPage < totalPages - 1;
+
+  const goToPrevPage = useCallback(() => {
+    if (!viewerReady || currentPage <= 0) return;
+    flipRef.current?.pageFlip()?.flipPrev();
+  }, [viewerReady, currentPage]);
+
+  const goToNextPage = useCallback(() => {
+    if (!viewerReady || totalPages <= 0 || currentPage >= totalPages - 1) return;
+    flipRef.current?.pageFlip()?.flipNext();
+  }, [viewerReady, currentPage, totalPages]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isFullscreen) {
+          setIsFullscreen(false);
+        } else {
+          onClose();
+        }
+        return;
+      }
+
+      const target = e.target;
+      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToPrevPage();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goToNextPage();
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, isFullscreen, onClose, goToPrevPage, goToNextPage]);
+
   const displayPage = totalPages > 0 ? Math.min(currentPage + 1, totalPages) : 1;
   const maxPageDigits = totalPages > 0 ? String(totalPages).length : 1;
 
@@ -408,13 +438,12 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
             >
               <button
                 type="button"
-                onClick={() => flipRef.current?.pageFlip()?.flipPrev()}
-                className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
+                onClick={goToPrevPage}
+                disabled={!canGoPrev}
+                className={navButtonClass(isMobile)}
                 aria-label="Попередня сторінка"
               >
-                <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                <ChevronLeft className={navIconClass(isMobile)} aria-hidden="true" />
               </button>
 
               {!isMobile && (
@@ -443,13 +472,12 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
               <button
                 type="button"
-                onClick={() => flipRef.current?.pageFlip()?.flipNext()}
-                className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-2' : 'p-3'}`}
+                onClick={goToNextPage}
+                disabled={!canGoNext}
+                className={navButtonClass(isMobile)}
                 aria-label="Наступна сторінка"
               >
-                <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <ChevronRight className={navIconClass(isMobile)} aria-hidden="true" />
               </button>
             </div>
           </motion.div>

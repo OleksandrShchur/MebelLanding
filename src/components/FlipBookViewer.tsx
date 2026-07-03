@@ -108,7 +108,6 @@ const FlipBookViewer = ({
   );
 
   const bookRef = useRef<FlipBookRef | null>(null);
-  const pointerStartX = useRef(0);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const resolvedHeight = displayHeight ?? DEFAULT_DISPLAY_HEIGHT;
@@ -143,30 +142,6 @@ const FlipBookViewer = ({
       }
     },
     [currentPage, onPageChange, setSearchParams]
-  );
-
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    pointerStartX.current = e.clientX;
-    if (e.pointerType === 'touch') {
-      e.preventDefault();
-    }
-  }, []);
-
-  const handlePointerUp = useCallback(
-    (e: React.PointerEvent) => {
-      if (isMobile) return;
-
-      const delta = e.clientX - pointerStartX.current;
-      const pageFlip = bookRef.current?.pageFlip();
-      if (!pageFlip) return;
-
-      if (delta > 60) {
-        pageFlip.flipNext();
-      } else if (delta < -60) {
-        pageFlip.flipPrev();
-      }
-    },
-    [isMobile]
   );
 
   useEffect(() => {
@@ -230,12 +205,7 @@ const FlipBookViewer = ({
   const bookKey = `${isMobile ? 'mobile' : 'desktop'}-${singlePage ? 'single' : 'spread'}`;
 
   return (
-    <div
-      className="flex h-full w-full touch-none items-center justify-center overflow-hidden"
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onTouchStart={(e) => e.preventDefault()}
-    >
+    <div className="flex h-full w-full touch-none items-center justify-center overflow-hidden">
       {singlePage && !isMobile && (
         <HTMLFlipBook
           ref={bookRef}
