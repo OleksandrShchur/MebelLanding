@@ -115,7 +115,8 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
   useEffect(() => {
     if (magazine) {
-      setSinglePage(magazine.page.spread === 'single');
+      const isSinglePageCatalog = magazine.images.length <= 1;
+      setSinglePage(isSinglePageCatalog || magazine.page.spread === 'single');
     }
   }, [magazine]);
 
@@ -177,6 +178,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
   );
 
   const totalPages = magazine?.images.length ?? 0;
+  const forceSinglePage = totalPages <= 1;
   const canGoPrev = viewerReady && currentPage > 0;
   const canGoNext = viewerReady && totalPages > 0 && currentPage < totalPages - 1;
 
@@ -274,7 +276,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
 
   if (!magazine) return null;
 
-  const effectiveSinglePage = isMobile ? true : singlePage;
+  const effectiveSinglePage = isMobile || forceSinglePage || singlePage;
 
   const headerHeight = chromeHeights.header || HEADER_FALLBACK;
   const footerHeight = chromeHeights.footer || FOOTER_FALLBACK;
@@ -283,7 +285,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
     getAvailableBookArea(
       magazine,
       isMobile,
-      singlePage,
+      effectiveSinglePage,
       viewport.width,
       viewport.height,
       isFullscreen,
@@ -447,7 +449,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                 <ChevronLeft className={navIconClass(isMobile)} aria-hidden="true" />
               </button>
 
-              {!isMobile && (
+              {!isMobile && !forceSinglePage && (
                 <div
                   className="flex items-center gap-3 bg-mebel-surface-raised/90 backdrop-blur-sm border border-mebel-border shadow rounded-full px-4 py-1"
                   onClick={(e) => e.stopPropagation()}
