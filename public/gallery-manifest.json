@@ -1,15 +1,14 @@
 {
   "wardrobes": [],
-  "sofas": [],
-  "kitchens": [
+  "sofas": [
     {
       "id": 1,
       "name": "Агат-М",
       "orientation": "landscape",
       "page": {
-        "width": 1654,
+        "width": 3307,
         "height": 1575,
-        "spread": "double"
+        "spread": "single"
       },
       "images": [
         "/images/catalogs/Агат-М/AgatM_Catalogue_2023-24_page01.webp",
@@ -126,7 +125,9 @@
         "/images/catalogs/Віко Меблі/ВікоМеблі/VIKO CATALOG 2026_page49.webp",
         "/images/catalogs/Віко Меблі/ВікоМеблі/VIKO CATALOG 2026_page50.webp"
       ]
-    },
+    }
+  ],
+  "kitchens": [
     {
       "id": 3,
       "name": "Вісент 1",
@@ -137,7 +138,6 @@
         "spread": "double"
       },
       "images": [
-        "/images/catalogs/Вісент/Вісент 1/Вісент_page01.webp",
         "/images/catalogs/Вісент/Вісент 1/Вісент_page02.webp",
         "/images/catalogs/Вісент/Вісент 1/Вісент_page03.webp",
         "/images/catalogs/Вісент/Вісент 1/Вісент_page04.webp",
