@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [pendingCategoriesScroll, setPendingCategoriesScroll] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -17,11 +21,36 @@ const ScrollToTopButton = () => {
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
-    });
+  const scrollToCategories = () => {
+    const element = document.getElementById('categories');
+    if (!element) return false;
+
+    const headerHeight =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
+      ) || 56;
+    const top = element.getBoundingClientRect().top + window.scrollY - headerHeight;
+    window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    return true;
+  };
+
+  useEffect(() => {
+    if (!pendingCategoriesScroll) return;
+    if (location.pathname !== '/') return;
+
+    const timer = window.setTimeout(() => {
+      scrollToCategories();
+      setPendingCategoriesScroll(false);
+    }, 50);
+
+    return () => window.clearTimeout(timer);
+  }, [location.pathname, pendingCategoriesScroll, prefersReducedMotion]);
+
+  const handleClick = () => {
+    if (scrollToCategories()) return;
+
+    setPendingCategoriesScroll(true);
+    navigate('/');
   };
 
   const instant = { opacity: 1, scale: 1, y: 0 };
@@ -35,9 +64,9 @@ const ScrollToTopButton = () => {
         <motion.button
           key="scroll-to-top"
           type="button"
-          onClick={scrollToTop}
+          onClick={handleClick}
           className="group fixed bottom-4 right-4 z-50 rounded-full bg-mebel-olive p-3 text-white shadow-lg hover:bg-mebel-olive-darker active:bg-mebel-olive-darkest"
-          aria-label="Scroll to top"
+          aria-label="Перейти до категорій"
           initial={prefersReducedMotion ? instant : { opacity: 0, scale: 0.7, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={prefersReducedMotion ? instant : { opacity: 0, scale: 0.7, y: 12 }}
