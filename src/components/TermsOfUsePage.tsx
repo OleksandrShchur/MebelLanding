@@ -20,7 +20,7 @@ const TermsOfUsePage = () => {
             <section className="border-b border-mebel-border bg-gradient-to-b from-mebel-surface to-mebel-cream">
                 <div className="max-w-5xl mx-auto px-6 md:px-10 py-16 md:py-24">
                     <p className="text-sm uppercase tracking-[0.2em] text-mebel-accent mb-4">
-                        Mebel Landing
+                        Магазин Mebel
                     </p>
                     <h1 className="font-display text-4xl md:text-5xl font-semibold leading-tight mb-6">
                         Умови використання сайту
