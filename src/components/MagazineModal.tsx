@@ -12,12 +12,13 @@ import ToggleButton from 'react-toggle-button';
 
 interface MagazineModalProps {
   magazine: Magazine | null;
+  categoryName?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const PADDING = 8;
-const HEADER_FALLBACK = 72;
+const HEADER_FALLBACK = 48;
 const FOOTER_FALLBACK = 80;
 const BOOK_HORIZONTAL_PADDING = 16;
 
@@ -78,7 +79,7 @@ function bucketBookDimension(value: number, step = 80): number {
   return Math.max(step, Math.round(value / step) * step);
 }
 
-const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
+const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModalProps) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const prefersReducedMotion = useReducedMotion();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -329,14 +330,36 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
             transition={panelSpring}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header — page progress */}
+            {/* Header — single compact row */}
             <div
               ref={headerRef}
-              className="relative z-20 shrink-0 border-b border-mebel-border bg-mebel-surface-raised px-4 pt-3 pb-2"
+              className="relative z-20 shrink-0 border-b border-mebel-border bg-mebel-surface-raised px-3 py-2 sm:px-4"
             >
-              <div className="flex flex-col items-center justify-center min-h-[28px] gap-1">
-                <div className="flex items-center justify-center gap-1.5 text-sm font-medium text-mebel-text-subtle">
-                  <span>Сторінка</span>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+                <div className="min-w-0">
+                  {(categoryName || magazine.name) && (
+                    <p
+                      className="min-w-0 truncate text-left text-[11px] leading-tight text-mebel-text-subtle sm:text-xs"
+                      title={categoryName ? `${categoryName} › ${magazine.name}` : magazine.name}
+                    >
+                      {categoryName ? (
+                        <>
+                          <span>{categoryName}</span>
+                          <span className="mx-1.5 opacity-50" aria-hidden="true">
+                            ›
+                          </span>
+                        </>
+                      ) : null}
+                      <span className="text-mebel-text-muted">{magazine.name}</span>
+                    </p>
+                  )}
+                </div>
+
+                <div
+                  className="flex shrink-0 items-center gap-1 text-sm font-medium text-mebel-text-subtle"
+                  title="Натисніть на номер, щоб перейти до сторінки"
+                >
+                  <span className="hidden sm:inline">Сторінка</span>
                   <input
                     ref={pageInputRef}
                     type="text"
@@ -349,7 +372,7 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                     onKeyDown={handlePageInputKeyDown}
                     aria-label={`Номер сторінки від 1 до ${totalPages}`}
                     title={`Введіть номер сторінки (1–${totalPages}) і натисніть Enter`}
-                    className={`w-11 rounded-md border bg-white px-1.5 py-0.5 text-center text-sm font-semibold text-mebel-olive tabular-nums transition-colors focus:outline-none focus:ring-2 focus:ring-mebel-tan/60 ${
+                    className={`w-10 rounded-md border bg-white px-1 py-0.5 text-center text-sm font-semibold text-mebel-olive tabular-nums transition-colors focus:outline-none focus:ring-2 focus:ring-mebel-tan/60 sm:w-11 sm:px-1.5 ${
                       isEditingPage
                         ? 'border-mebel-tan shadow-sm'
                         : 'border-mebel-border hover:border-mebel-tan/70'
@@ -357,10 +380,33 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                   />
                   <span aria-hidden="true">/ {totalPages}</span>
                 </div>
-                <p className="text-[11px] leading-tight text-mebel-text-subtle/80">
-                  Натисніть на номер, щоб перейти до сторінки
-                </p>
+
+                <div className="flex shrink-0 items-center justify-end gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsFullscreen((prev) => !prev)}
+                    className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-1.5' : 'p-2'}`}
+                    aria-label={isFullscreen ? 'Вийти з повноекранного режиму' : 'Повноекранний режим'}
+                  >
+                    {isFullscreen ? (
+                      <Minimize2 className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
+                    ) : (
+                      <Maximize2 className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-1.5' : 'p-2'}`}
+                    aria-label="Закрити"
+                  >
+                    <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
+
               <div className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-mebel-border-muted">
                 <motion.div
                   className="h-full rounded-full bg-mebel-tan"
@@ -368,32 +414,6 @@ const MagazineModal = ({ magazine, isOpen, onClose }: MagazineModalProps) => {
                   transition={progressSpring}
                 />
               </div>
-            </div>
-
-            {/* Top-right controls */}
-            <div className="absolute top-2 right-2 z-30 flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setIsFullscreen((prev) => !prev)}
-                className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-1.5' : 'p-2'}`}
-                aria-label={isFullscreen ? 'Вийти з повноекранного режиму' : 'Повноекранний режим'}
-              >
-                {isFullscreen ? (
-                  <Minimize2 className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
-                ) : (
-                  <Maximize2 className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className={`bg-mebel-olive text-white rounded-full hover:bg-mebel-olive-dark transition-all shadow-md ${isMobile ? 'p-1.5' : 'p-2'}`}
-                aria-label="Закрити"
-              >
-                <svg className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
 
             {/* Book area */}

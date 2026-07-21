@@ -57,6 +57,10 @@ function Home() {
       ? findMagazineByCategoryAndId(data, categoryParam, Number.parseInt(magazineIdParam, 10))
       : null;
   const isModalOpen = !!selectedMagazine;
+  const categoryName =
+    categoryParam && isValidCategory(categoryParam)
+      ? categories.find((cat) => cat.id === categoryParam)?.name
+      : undefined;
   const hasRouteParams = !!categoryParam || !!magazineIdParam;
   const hasInvalidRouteParams =
     (!!categoryParam && !isValidCategory(categoryParam)) ||
@@ -170,6 +174,7 @@ function Home() {
 
       <MagazineModal
         magazine={selectedMagazine}
+        categoryName={categoryName}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
