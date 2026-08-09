@@ -30,7 +30,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="font-sans min-h-screen bg-mebel-cream">
       <Header />
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={pageKey}
           initial={prefersReducedMotion ? instant : { opacity: 0, y: 8 }}

@@ -1,10 +1,4 @@
-import { useEffect } from 'react';
-
 const TermsOfUsePage = () => {
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
   return (
     <div className="font-sans min-h-screen bg-mebel-cream text-mebel-text-strong">
       <section className="border-b border-mebel-border bg-gradient-to-b from-mebel-surface to-mebel-cream">
