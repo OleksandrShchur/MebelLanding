@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import LoadingSpinner from './LoadingSpinner';
@@ -86,8 +86,8 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
   const [singlePage, setSinglePage] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewport, setViewport] = useState(() => ({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: typeof window === 'undefined' ? 1024 : window.innerWidth,
+    height: typeof window === 'undefined' ? 768 : window.innerHeight,
   }));
   const flipRef = useRef<FlipBookRef | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
@@ -130,13 +130,18 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
     }
   }, [isOpen]);
 
+  const magazineId = magazine?.id;
+  const magazineImages = magazine?.images;
+
   useEffect(() => {
-    if (!isOpen || !magazine) return;
+    if (!isOpen || !magazineId || !magazineImages) return;
     flipRef.current = null;
     const pageIndex = parsePageIndex(searchParams.get('page'));
     setCurrentPage(pageIndex);
-    prefetchMagazinePagesAround(magazine.images, pageIndex);
-  }, [isOpen, magazine]);
+    prefetchMagazinePagesAround(magazineImages, pageIndex);
+    // Only reset when the open magazine changes — not on search-param / referential updates.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed by magazineId
+  }, [isOpen, magazineId]);
 
   useEffect(() => {
     if (!isOpen) return;
