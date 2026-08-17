@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { FaFacebook, FaWhatsapp, FaViber, FaTelegram } from 'react-icons/fa';
 import { storeContact } from '../data/storeContact';
