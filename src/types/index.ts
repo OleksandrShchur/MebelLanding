@@ -1,9 +1,15 @@
+export interface MagazinePage {
+  src: string;
+  /** Starting price in UAH. Omit on navigation, cover, and TOC pages. */
+  priceFrom?: number;
+}
+
 export interface Magazine {
   id: number;
   name: string;
   orientation: 'portrait' | 'landscape';
   page: PageDimensions;
-  images: string[];
+  pages: MagazinePage[];
 }
 
 export type Category =

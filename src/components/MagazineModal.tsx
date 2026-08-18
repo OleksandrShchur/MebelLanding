@@ -1,11 +1,12 @@
-import { useEffect, useState, useCallback, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import type { Magazine } from '../types';
+import type { Magazine, MagazinePage } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import LoadingSpinner from './LoadingSpinner';
 import { prefetchMagazinePagesAround } from '../hooks/useCatalogPageLoader';
+import { formatPriceFrom, getMagazineSrcs } from '../lib/gallery';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import ToggleButton from 'react-toggle-button';
@@ -20,6 +21,7 @@ interface MagazineModalProps {
 const PADDING = 8;
 const HEADER_FALLBACK = 48;
 const FOOTER_FALLBACK = 80;
+const PRICE_STRIP_HEIGHT = 44;
 const BOOK_HORIZONTAL_PADDING = 16;
 
 const navButtonClass = (isMobile: boolean) =>
@@ -64,9 +66,23 @@ function getAvailableBookArea(
   const verticalInset = isFullscreen ? 0 : PADDING * 2;
 
   const availW = viewportWidth - horizontalInset;
-  const availH = viewportHeight - verticalInset - headerHeight - footerHeight;
+  const availH =
+    viewportHeight - verticalInset - headerHeight - footerHeight - PRICE_STRIP_HEIGHT;
 
   return fitBookSize(magazine, isMobile, singlePage, availW, availH);
+}
+
+function getVisiblePages(
+  pages: MagazinePage[],
+  currentPage: number,
+  singlePage: boolean
+): Array<MagazinePage | undefined> {
+  if (singlePage || pages.length <= 1) {
+    return [pages[currentPage]];
+  }
+
+  const leftIndex = currentPage % 2 === 0 ? currentPage : currentPage - 1;
+  return [pages[leftIndex], pages[leftIndex + 1]];
 }
 
 function parsePageIndex(value: string | null): number {
@@ -86,8 +102,8 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
   const [singlePage, setSinglePage] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewport, setViewport] = useState(() => ({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: typeof window === 'undefined' ? 1024 : window.innerWidth,
+    height: typeof window === 'undefined' ? 768 : window.innerHeight,
   }));
   const flipRef = useRef<FlipBookRef | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
@@ -116,7 +132,7 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
 
   useEffect(() => {
     if (magazine) {
-      const isSinglePageCatalog = magazine.images.length <= 1;
+      const isSinglePageCatalog = magazine.pages.length <= 1;
       setSinglePage(isSinglePageCatalog || magazine.page.spread === 'single');
     }
   }, [magazine]);
@@ -130,13 +146,21 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
     }
   }, [isOpen]);
 
+  const magazineId = magazine?.id;
+  const magazineSrcs = useMemo(
+    () => (magazine ? getMagazineSrcs(magazine) : []),
+    [magazine]
+  );
+
   useEffect(() => {
-    if (!isOpen || !magazine) return;
+    if (!isOpen || !magazineId || magazineSrcs.length === 0) return;
     flipRef.current = null;
     const pageIndex = parsePageIndex(searchParams.get('page'));
     setCurrentPage(pageIndex);
-    prefetchMagazinePagesAround(magazine.images, pageIndex);
-  }, [isOpen, magazine]);
+    prefetchMagazinePagesAround(magazineSrcs, pageIndex);
+    // Only reset when the open magazine changes — not on search-param / referential updates.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed by magazineId
+  }, [isOpen, magazineId]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -178,7 +202,7 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
     [setSearchParams]
   );
 
-  const totalPages = magazine?.images.length ?? 0;
+  const totalPages = magazine?.pages.length ?? 0;
   const forceSinglePage = totalPages <= 1;
   const canGoPrev = viewerReady && currentPage > 0;
   const canGoNext = viewerReady && totalPages > 0 && currentPage < totalPages - 1;
@@ -299,6 +323,7 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
     : Math.min(bookSize.width + BOOK_HORIZONTAL_PADDING, viewport.width - PADDING * 2);
 
   const progress = totalPages > 0 ? (displayPage / totalPages) * 100 : 0;
+  const visiblePages = getVisiblePages(magazine.pages, currentPage, effectiveSinglePage);
 
   return (
     <AnimatePresence>
@@ -428,7 +453,7 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
                 >
                   <FlipBookViewer
                     key={`${bucketBookDimension(bookSize.width)}x${bucketBookDimension(bookSize.height)}-${effectiveSinglePage}-${isFullscreen}`}
-                    images={magazine.images}
+                    images={magazineSrcs}
                     orientation={magazine.orientation}
                     pageDimensions={magazine.page}
                     displayHeight={bookSize.height}
@@ -452,6 +477,24 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+
+            <div
+              className="flex shrink-0 items-center justify-center px-2"
+              style={{ height: PRICE_STRIP_HEIGHT }}
+              aria-live="polite"
+            >
+              <div className="flex items-center" style={{ width: bookSize.width }}>
+                {visiblePages.map((page, index) => (
+                  <div key={index} className="flex min-w-0 flex-1 items-center justify-center">
+                    {page?.priceFrom != null ? (
+                      <span className="font-display text-base font-semibold text-mebel-olive tabular-nums sm:text-lg">
+                        {formatPriceFrom(page.priceFrom)}
+                      </span>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Bottom bar — prev/next + toggle */}

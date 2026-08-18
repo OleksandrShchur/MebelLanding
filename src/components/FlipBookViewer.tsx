@@ -86,6 +86,7 @@ const Page = memo(
             style={{ aspectRatio: `${width} / ${height}` }}
             className="max-h-full max-w-full object-scale-down"
             onLoad={handleLoad}
+            onError={handleLoad}
           />
         ) : (
           <div

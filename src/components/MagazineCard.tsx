@@ -1,4 +1,5 @@
 import type { Magazine } from "../types";
+import { getMagazineSrcs } from "../lib/gallery";
 import { assetUrl, catalogImageUrl } from "../utils/assets";
 import { prefetchMagazinePages } from "../hooks/useCatalogPageLoader";
 
@@ -9,11 +10,12 @@ interface MagazineCardProps {
 }
 
 const MagazineCard = ({ magazine, onClick, disabled = false }: MagazineCardProps) => {
-  const coverImage = magazine.images[0];
+  const srcs = getMagazineSrcs(magazine);
+  const coverImage = srcs[0];
 
   const handlePrefetch = () => {
     if (!disabled) {
-      prefetchMagazinePages(magazine.images, 3);
+      prefetchMagazinePages(srcs, 3);
     }
   };
 

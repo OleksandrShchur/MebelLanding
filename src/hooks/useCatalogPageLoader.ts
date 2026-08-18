@@ -42,24 +42,31 @@ interface UseCatalogPageLoaderOptions {
 export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalogPageLoaderOptions) {
   const [loadedPages, setLoadedPages] = useState<ReadonlySet<number>>(() => new Set());
   const loadingRef = useRef(new Set<number>());
+  const pageCount = images.length;
+  const imageListKey = images.join('\0');
 
-  const imageUrls = useMemo(() => images.map((image) => catalogImageUrl(image)), [images]);
+  const imageUrls = useMemo(
+    () => images.map((image) => catalogImageUrl(image)),
+    // imageListKey captures contents so a new array with the same pages does not reset loading.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by image contents
+    [imageListKey]
+  );
 
   const shouldLoadPage = useCallback(
     (index: number) => {
       if (!enabled) return false;
-      const { high, low } = getLoadIndices(currentPage, images.length);
+      const { high, low } = getLoadIndices(currentPage, pageCount);
       return high.includes(index) || low.includes(index);
     },
-    [currentPage, enabled, images.length]
+    [currentPage, enabled, pageCount]
   );
 
   const isHighPriorityPage = useCallback(
     (index: number) => {
       if (!enabled) return false;
-      return getLoadIndices(currentPage, images.length).high.includes(index);
+      return getLoadIndices(currentPage, pageCount).high.includes(index);
     },
-    [currentPage, enabled, images.length]
+    [currentPage, enabled, pageCount]
   );
 
   const markPageLoaded = useCallback((index: number) => {
@@ -72,24 +79,24 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
   }, []);
 
   useEffect(() => {
-    if (!enabled || images.length === 0) return;
+    if (!enabled || imageUrls.length === 0) return;
 
     setLoadedPages(() => {
       const seeded = new Set<number>();
-      images.forEach((_, index) => {
-        if (isImageCached(imageUrls[index])) {
+      imageUrls.forEach((url, index) => {
+        if (isImageCached(url)) {
           seeded.add(index);
         }
       });
       return seeded;
     });
     loadingRef.current.clear();
-  }, [enabled, imageUrls, images]);
+  }, [enabled, imageUrls]);
 
   useEffect(() => {
-    if (!enabled || images.length === 0) return;
+    if (!enabled || imageUrls.length === 0) return;
 
-    const { high, low } = getLoadIndices(currentPage, images.length);
+    const { high, low } = getLoadIndices(currentPage, imageUrls.length);
     let cancelled = false;
 
     const queue = async () => {
@@ -98,10 +105,10 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
         loadingRef.current.add(index);
         try {
           await preloadImage(imageUrls[index], 'high');
-          if (!cancelled) markPageLoaded(index);
         } catch {
           /* page component shows fallback */
         } finally {
+          if (!cancelled) markPageLoaded(index);
           loadingRef.current.delete(index);
         }
       }
@@ -110,11 +117,9 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
         if (cancelled || loadingRef.current.has(index)) continue;
         loadingRef.current.add(index);
         void preloadImage(imageUrls[index], 'low')
-          .then(() => {
-            if (!cancelled) markPageLoaded(index);
-          })
           .catch(() => undefined)
           .finally(() => {
+            if (!cancelled) markPageLoaded(index);
             loadingRef.current.delete(index);
           });
       }
@@ -125,19 +130,19 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
     return () => {
       cancelled = true;
     };
-  }, [currentPage, enabled, imageUrls, images.length, markPageLoaded]);
+  }, [currentPage, enabled, imageUrls, markPageLoaded]);
 
   const windowPagesReady = useMemo(() => {
-    if (!enabled || images.length === 0) return false;
-    const { high } = getLoadIndices(currentPage, images.length);
+    if (!enabled || imageUrls.length === 0) return false;
+    const { high } = getLoadIndices(currentPage, imageUrls.length);
     return high.every((index) => loadedPages.has(index));
-  }, [currentPage, enabled, images.length, loadedPages]);
+  }, [currentPage, enabled, imageUrls.length, loadedPages]);
 
   const [viewerReady, setViewerReady] = useState(false);
 
   useEffect(() => {
     setViewerReady(false);
-  }, [images]);
+  }, [imageListKey]);
 
   useEffect(() => {
     if (windowPagesReady) {

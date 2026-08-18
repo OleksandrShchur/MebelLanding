@@ -76,14 +76,51 @@ async function derivePageMetadata(firstImagePath) {
   };
 }
 
-async function buildMagazine(catalog, id) {
+async function loadExistingPriceBySrc() {
+  try {
+    const raw = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
+    const priceBySrc = new Map();
+
+    for (const magazines of Object.values(raw)) {
+      if (!Array.isArray(magazines)) continue;
+
+      for (const magazine of magazines) {
+        const pages = Array.isArray(magazine.pages) ? magazine.pages : [];
+        for (const page of pages) {
+          if (
+            page &&
+            typeof page.src === 'string' &&
+            typeof page.priceFrom === 'number' &&
+            Number.isInteger(page.priceFrom) &&
+            page.priceFrom > 0
+          ) {
+            priceBySrc.set(page.src, page.priceFrom);
+          }
+        }
+      }
+    }
+
+    return priceBySrc;
+  } catch {
+    return new Map();
+  }
+}
+
+function buildPages(srcs, priceBySrc) {
+  return srcs.map((src) => {
+    const priceFrom = priceBySrc.get(src);
+    return priceFrom != null ? { src, priceFrom } : { src };
+  });
+}
+
+async function buildMagazine(catalog, id, priceBySrc) {
   const entries = await listEntries(catalog.fullPath);
   const webps = entries
     .filter((e) => e.isFile() && e.name.toLowerCase().endsWith('.webp'))
     .map((e) => e.name)
     .sort(naturalSort);
 
-  const images = webps.map((name) => `/images/catalogs/${catalog.relativePath}/${name}`);
+  const srcs = webps.map((name) => `/images/catalogs/${catalog.relativePath}/${name}`);
   const leafName = path.basename(catalog.relativePath);
   const firstImage = webps[0] ? path.join(catalog.fullPath, webps[0]) : null;
   const { orientation, page } = await derivePageMetadata(firstImage);
@@ -93,17 +130,18 @@ async function buildMagazine(catalog, id) {
     name: leafName,
     orientation,
     page,
-    images,
+    pages: buildPages(srcs, priceBySrc),
   };
 }
 
 async function main() {
   const catalogs = await discoverCatalogLeaves(catalogsDir);
   catalogs.sort((a, b) => a.relativePath.localeCompare(b.relativePath, undefined, { sensitivity: 'base' }));
+  const priceBySrc = await loadExistingPriceBySrc();
 
   const kitchens = [];
   for (let i = 0; i < catalogs.length; i += 1) {
-    kitchens.push(await buildMagazine(catalogs[i], i + 1));
+    kitchens.push(await buildMagazine(catalogs[i], i + 1, priceBySrc));
   }
 
   const manifest = {
