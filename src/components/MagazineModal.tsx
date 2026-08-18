@@ -147,14 +147,14 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
   }, [isOpen]);
 
   const magazineId = magazine?.id;
-  const magazineImages = magazine?.images;
+  const magazineSrcs = magazine ? getMagazineSrcs(magazine) : [];
 
   useEffect(() => {
-    if (!isOpen || !magazineId || !magazineImages) return;
+    if (!isOpen || !magazineId || magazineSrcs.length === 0) return;
     flipRef.current = null;
     const pageIndex = parsePageIndex(searchParams.get('page'));
     setCurrentPage(pageIndex);
-    prefetchMagazinePagesAround(magazineImages, pageIndex);
+    prefetchMagazinePagesAround(magazineSrcs, pageIndex);
     // Only reset when the open magazine changes — not on search-param / referential updates.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed by magazineId
   }, [isOpen, magazineId]);
