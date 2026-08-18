@@ -1,93 +1,170 @@
 # Mebel Store - Furniture Landing Page
 
-A responsive React + TypeScript furniture store landing page with a magazine-style product viewer. Pages are **prerendered at build time** (static HTML + hydration) for fast first paint on Cloudflare’s free tier.
+A responsive React + TypeScript landing page for a furniture store featuring a magazine-style product viewer with page-flipping animation.
 
 ## Features
 
-- **Prerendered routes**: `/`, `/terms`, and catalog deep links ship as static HTML
 - **Responsive Design**: Mobile-first layout with breakpoints for mobile (< 768px), tablet (768px - 1024px), and desktop (> 1024px)
-- **Hero**: Full-bleed hero with brand-forward messaging
-- **Categories Grid**: Interactive category cards
-- **Magazine Viewer**: Fullscreen modal with page-flipping animation (client-only)
-- **Lazy Loading**: Catalog page images load on demand
+- **Hero Carousel**: Auto-sliding image carousel with manual navigation and pagination
+- **Categories Grid**: Interactive cards for Wardrobes, Sofas, and Kitchens
+- **Magazine Viewer**: Fullscreen modal with realistic page-flipping animation
+- **Page Flipping**: Desktop shows two pages per spread, mobile shows single pages
+- **Orientation Support**: Handles both portrait and landscape image orientations
+- **Lazy Loading**: Images load on demand for better performance
 - **Keyboard Navigation**: ESC to close modal, arrow keys for navigation
 
 ## Tech Stack
 
 - React 19
 - TypeScript
-- React Router 7 (framework mode, `ssr: false` + prerender)
 - Vite
 - Tailwind CSS
-- react-pageflip
-- Cloudflare Workers Static Assets (Wrangler)
+- react-pageflip for page flipping animation
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+ (22+ recommended)
+- Node.js (v16 or higher)
 - npm
-- Catalog images at `public/images/catalogs` (gitignored; required for a full local preview)
 
 ### Installation
 
-```bash
-npm install
-npm run dev
-```
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:5173](http://localhost:5173).
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-### Build
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
+
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-Output: `build/client` (prerendered HTML, assets, and copied `public/` files).
-
-### Deploy (Cloudflare free tier)
+### Deploy to GitHub Pages
 
 ```bash
 npm run deploy
 ```
 
-This runs `react-router build` then `wrangler deploy`. Static assets are served from the edge with **no per-request Worker SSR**, so HTML/image traffic does not consume the free Worker request quota.
-
-**Free-tier limits to stay under:**
-
-- ≤ 20,000 files per Worker version
-- ≤ 25 MiB per individual file
-- Catalog WebPs stay same-origin under `/images/catalogs/...` (include them in the deploy machine/CI; they are not in git)
-
-Optional GitHub Pages deploy of the static client build:
-
-```bash
-npm run deploy:gh-pages
-```
-
 ## Project Structure
 
 ```
-app/
-├── components/     # UI (Home, hero, catalogs, flipbook modal, …)
-├── data/           # Categories + store contact
+src/
+├── components/
+│   ├── Header.tsx          # Navigation header
+│   ├── HeroCarousel.tsx    # Image carousel
+│   ├── CategoriesGrid.tsx  # Category selection cards
+│   ├── CategorySection.tsx # Product sections
+│   ├── MagazineCard.tsx    # Individual product cards
+│   ├── MagazineModal.tsx   # Fullscreen viewer modal
+│   ├── FlipBookViewer.tsx  # Page flipping component
+│   └── Footer.tsx          # Site footer
 ├── hooks/
-├── lib/gallery.ts  # Manifest normalize + loaders
-├── routes/         # Framework routes + loaders
-├── root.tsx
-└── routes.ts
+│   ├── useGallery.ts       # Data fetching hook
+│   └── useMediaQuery.ts    # Responsive breakpoint hook
+├── types/
+│   ├── index.ts            # TypeScript interfaces
+│   └── react-pageflip.d.ts # react-pageflip type definitions
+├── App.tsx                 # Main application component
+└── main.tsx                # Application entry point
+
 public/
-├── gallery-manifest.json
-├── _headers
-└── images/
-react-router.config.ts   # ssr:false + prerender paths
-wrangler.jsonc           # Static assets deploy
+├── gallery-manifest.json   # Product data
+└── images/                 # Product images
 ```
 
-## Cloudflare notes
+## Data Structure
 
-- Prefer asset-first serving (this project has no SSR Worker `main`).
-- Do not enable `run_worker_first` for HTML or `/images/*`.
-- Long-cache headers for hashed `/assets/*` and catalog images are in `public/_headers`.
+Product data is stored in `public/gallery-manifest.json` with the following structure:
+
+```json
+{
+  "wardrobes": [
+    {
+      "id": 1,
+      "name": "Modern Wardrobe",
+      "description": "A sleek and contemporary wardrobe",
+      "price": 799.99,
+      "orientation": "portrait",
+      "images": ["/path/to/image1.jpg", "/path/to/image2.jpg"]
+    }
+  ],
+  "sofas": [...],
+  "kitchens": [...]
+}
+```
+
+## Responsive Behavior
+
+- **Desktop**: Grid layouts, two-page flipbook spreads
+- **Mobile**: Stacked layouts, single-page flipbook
+- **Tablet**: Adaptive between desktop and mobile layouts
+
+## Contributing
+
+1. Follow the existing code style and TypeScript types
+2. Use functional components with hooks
+3. Ensure responsive design works across all breakpoints
+4. Test on multiple devices and browsers
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
+
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```

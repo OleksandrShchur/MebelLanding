@@ -8,12 +8,12 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+dist
+dist-ssr
+build
 .react-router
 .wrangler
 .wrangler-dry-run
-dist
-build
-dist-ssr
 *.local
 
 # Editor directories and files

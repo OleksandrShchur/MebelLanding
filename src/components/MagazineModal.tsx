@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback, useMemo, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
-import type { Magazine, MagazinePage } from '../types';
+import { useSearchParams } from 'react-router';
+import type { Magazine } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import LoadingSpinner from './LoadingSpinner';
 import { prefetchMagazinePagesAround } from '../hooks/useCatalogPageLoader';
@@ -102,8 +102,8 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
   const [singlePage, setSinglePage] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewport, setViewport] = useState(() => ({
-    width: typeof window === 'undefined' ? 1024 : window.innerWidth,
-    height: typeof window === 'undefined' ? 768 : window.innerHeight,
+    width: window.innerWidth,
+    height: window.innerHeight,
   }));
   const flipRef = useRef<FlipBookRef | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
@@ -147,17 +147,14 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
   }, [isOpen]);
 
   const magazineId = magazine?.id;
-  const magazineSrcs = useMemo(
-    () => (magazine ? getMagazineSrcs(magazine) : []),
-    [magazine]
-  );
+  const magazineImages = magazine?.images;
 
   useEffect(() => {
-    if (!isOpen || !magazineId || magazineSrcs.length === 0) return;
+    if (!isOpen || !magazineId || !magazineImages) return;
     flipRef.current = null;
     const pageIndex = parsePageIndex(searchParams.get('page'));
     setCurrentPage(pageIndex);
-    prefetchMagazinePagesAround(magazineSrcs, pageIndex);
+    prefetchMagazinePagesAround(magazineImages, pageIndex);
     // Only reset when the open magazine changes — not on search-param / referential updates.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed by magazineId
   }, [isOpen, magazineId]);
