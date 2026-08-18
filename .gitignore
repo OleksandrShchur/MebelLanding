@@ -8,6 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.react-router
+.wrangler
+.wrangler-dry-run
 dist
 build
 dist-ssr
