@@ -1,8 +1,8 @@
-import { useRef, useState, useEffect, useCallback, useMemo, forwardRef, memo } from 'react';
+import { useRef, useState, useEffect, useCallback, forwardRef, memo } from 'react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useCatalogPageLoader } from '../hooks/useCatalogPageLoader';
 import HTMLFlipBook from 'react-pageflip';
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 import type { PageDimensions } from '../types';
 
 export interface FlipBookRef {
@@ -135,11 +135,9 @@ const FlipBookViewer = ({
     onReadyChange?.(viewerReady);
   }, [viewerReady, onReadyChange]);
 
-  const imagesKey = useMemo(() => images.join('\0'), [images]);
-
   useEffect(() => {
     bookReadyReportedRef.current = false;
-  }, [imagesKey, pageWidth, pageHeight, singlePage, isMobile]);
+  }, [images, pageWidth, pageHeight, singlePage, isMobile]);
 
   const handleFlip = useCallback(
     (e: { data: unknown }) => {

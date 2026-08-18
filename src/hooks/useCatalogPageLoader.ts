@@ -44,25 +44,22 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
   const loadingRef = useRef(new Set<number>());
 
   const imageUrls = useMemo(() => images.map((image) => catalogImageUrl(image)), [images]);
-  // Stable identity so loader revalidation / new array refs don't reset the viewer.
-  const imagesKey = useMemo(() => imageUrls.join('\0'), [imageUrls]);
-  const totalPages = imageUrls.length;
 
   const shouldLoadPage = useCallback(
     (index: number) => {
       if (!enabled) return false;
-      const { high, low } = getLoadIndices(currentPage, totalPages);
+      const { high, low } = getLoadIndices(currentPage, images.length);
       return high.includes(index) || low.includes(index);
     },
-    [currentPage, enabled, totalPages]
+    [currentPage, enabled, images.length]
   );
 
   const isHighPriorityPage = useCallback(
     (index: number) => {
       if (!enabled) return false;
-      return getLoadIndices(currentPage, totalPages).high.includes(index);
+      return getLoadIndices(currentPage, images.length).high.includes(index);
     },
-    [currentPage, enabled, totalPages]
+    [currentPage, enabled, images.length]
   );
 
   const markPageLoaded = useCallback((index: number) => {
@@ -75,24 +72,24 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
   }, []);
 
   useEffect(() => {
-    if (!enabled || totalPages === 0) return;
+    if (!enabled || images.length === 0) return;
 
     setLoadedPages(() => {
       const seeded = new Set<number>();
-      imageUrls.forEach((url, index) => {
-        if (isImageCached(url)) {
+      images.forEach((_, index) => {
+        if (isImageCached(imageUrls[index])) {
           seeded.add(index);
         }
       });
       return seeded;
     });
     loadingRef.current.clear();
-  }, [enabled, imagesKey, imageUrls, totalPages]);
+  }, [enabled, imageUrls, images]);
 
   useEffect(() => {
-    if (!enabled || totalPages === 0) return;
+    if (!enabled || images.length === 0) return;
 
-    const { high, low } = getLoadIndices(currentPage, totalPages);
+    const { high, low } = getLoadIndices(currentPage, images.length);
     let cancelled = false;
 
     const queue = async () => {
@@ -128,19 +125,19 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
     return () => {
       cancelled = true;
     };
-  }, [currentPage, enabled, imageUrls, imagesKey, markPageLoaded, totalPages]);
+  }, [currentPage, enabled, imageUrls, images.length, markPageLoaded]);
 
   const windowPagesReady = useMemo(() => {
-    if (!enabled || totalPages === 0) return false;
-    const { high } = getLoadIndices(currentPage, totalPages);
+    if (!enabled || images.length === 0) return false;
+    const { high } = getLoadIndices(currentPage, images.length);
     return high.every((index) => loadedPages.has(index));
-  }, [currentPage, enabled, loadedPages, totalPages]);
+  }, [currentPage, enabled, images.length, loadedPages]);
 
   const [viewerReady, setViewerReady] = useState(false);
 
   useEffect(() => {
     setViewerReady(false);
-  }, [imagesKey]);
+  }, [images]);
 
   useEffect(() => {
     if (windowPagesReady) {

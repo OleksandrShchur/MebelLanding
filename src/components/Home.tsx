@@ -1,52 +1,24 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import HeroCarousel from './HeroCarousel';
 import CategoriesGrid from './CategoriesGrid';
 import CategorySection from './CategorySection';
 import MagazineModal from './MagazineModal';
-import ClientOnly from './ClientOnly';
 import StateMessage from './StateMessage';
-import type { Category, CategoryItem, CategorySectionViewModel, Magazine } from '~/types';
-import { categories } from '~/data/categories';
-import { assetUrl } from '~/utils/assets';
-import {
-  findMagazineByCategoryAndId,
-  isValidCategory,
-  isValidId,
-  loadGalleryFromNetwork,
-  type GalleryLoaderData,
-} from '~/lib/gallery';
+import { useGallery } from '../hooks/useGallery';
+import type { Category, CategoryItem, CategorySectionViewModel, Magazine } from '../types';
+import { categories } from '../data/categories';
+import { assetUrl } from '../utils/assets';
 
 const catalogLoadingItems = Array.from({ length: 4 }, (_, index) => index);
 
-interface HomeProps {
-  initialGallery: GalleryLoaderData;
-}
-
-function Home({ initialGallery }: HomeProps) {
-  const [gallery, setGallery] = useState(initialGallery);
-  const [retrying, setRetrying] = useState(false);
+function Home() {
+  const { data, loading, error, retry, status } = useGallery();
   const { category: categoryParam, magazineId: magazineIdParam } = useParams<{
     category?: string;
     magazineId?: string;
   }>();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setGallery(initialGallery);
-  }, [initialGallery]);
-
-  const data = gallery.data;
-  const error = gallery.error;
-  const status = retrying ? 'loading' : gallery.status;
-  const loading = status === 'loading';
-
-  const retry = async () => {
-    setRetrying(true);
-    const next = await loadGalleryFromNetwork();
-    setGallery(next);
-    setRetrying(false);
-  };
 
   const categoryItems = useMemo<CategoryItem[]>(
     () =>
@@ -124,9 +96,7 @@ function Home({ initialGallery }: HomeProps) {
         items={categoryItems}
         onSelect={handleCategoryClick}
         error={error}
-        onRetry={() => {
-          void retry();
-        }}
+        onRetry={retry}
         emptyStateDescription="Список категорій порожній. Додайте дані до маніфесту каталогу, щоб заповнити секцію."
       />
 
@@ -163,12 +133,7 @@ function Home({ initialGallery }: HomeProps) {
               description="Ми не змогли завантажити добірку меблів. Перевірте інтернет-з’єднання та повторіть спробу."
               tone="error"
               action={
-                <button
-                  type="button"
-                  onClick={() => {
-                    void retry();
-                  }}
-                >
+                <button type="button" onClick={retry}>
                   Оновити каталог
                 </button>
               }
@@ -198,12 +163,7 @@ function Home({ initialGallery }: HomeProps) {
                 title="Каталоги ще наповнюються"
                 description="Ми підготували структуру категорій, але поки не знайшли жодного доступного каталогу для відображення."
                 action={
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void retry();
-                    }}
-                  >
+                  <button type="button" onClick={retry}>
                     Перевірити ще раз
                   </button>
                 }
@@ -212,16 +172,26 @@ function Home({ initialGallery }: HomeProps) {
           </section>
         ) : null}
 
-      <ClientOnly>
-        <MagazineModal
-          magazine={selectedMagazine}
-          categoryName={categoryName}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-        />
-      </ClientOnly>
+      <MagazineModal
+        magazine={selectedMagazine}
+        categoryName={categoryName}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </>
   );
+}
+
+function findMagazineByCategoryAndId(data: Record<Category, Magazine[]>, category: Category, id: number): Magazine | null {
+  return data[category].find(magazine => magazine.id === id) || null;
+}
+
+function isValidCategory(category: string): category is Category {
+  return categories.some(cat => cat.id === category);
+}
+
+function isValidId(id: string): boolean {
+  return !isNaN(parseInt(id)) && parseInt(id) > 0;
 }
 
 export default Home;
