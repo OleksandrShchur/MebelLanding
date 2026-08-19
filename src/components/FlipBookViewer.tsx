@@ -119,7 +119,7 @@ const FlipBookViewer = ({
   const resolvedHeight = displayHeight ?? DEFAULT_DISPLAY_HEIGHT;
   const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions, resolvedHeight);
 
-  const { imageUrls, shouldLoadPage, isHighPriorityPage, markPageLoaded, viewerReady } =
+  const { imageUrls, imagesKey, shouldLoadPage, isHighPriorityPage, markPageLoaded, viewerReady } =
     useCatalogPageLoader({
       images,
       currentPage,
@@ -138,7 +138,7 @@ const FlipBookViewer = ({
 
   useEffect(() => {
     bookReadyReportedRef.current = false;
-  }, [images, pageWidth, pageHeight, singlePage, isMobile]);
+  }, [imagesKey, pageWidth, pageHeight, singlePage, isMobile]);
 
   const handleFlip = useCallback(
     (e: { data: unknown }) => {

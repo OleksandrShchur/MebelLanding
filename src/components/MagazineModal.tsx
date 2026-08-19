@@ -1,12 +1,12 @@
-import { useEffect, useState, useCallback, useMemo, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useEffect, useState, useCallback, useRef, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
 import { useSearchParams } from 'react-router';
-import type { Magazine } from '../types';
+import type { Magazine, MagazinePage } from '../types';
 import FlipBookViewer, { type FlipBookRef } from './FlipBookViewer';
 import LoadingSpinner from './LoadingSpinner';
 import { prefetchMagazinePagesAround } from '../hooks/useCatalogPageLoader';
-import { formatPriceFrom, getMagazineSrcs } from '../lib/gallery';
+import { EMPTY_MAGAZINE_SRCS, formatPriceFrom } from '../lib/gallery';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import ToggleButton from 'react-toggle-button';
@@ -147,7 +147,7 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
   }, [isOpen]);
 
   const magazineId = magazine?.id;
-  const magazineSrcs = magazine ? getMagazineSrcs(magazine) : [];
+  const magazineSrcs = magazine?.srcs ?? EMPTY_MAGAZINE_SRCS;
 
   useEffect(() => {
     if (!isOpen || !magazineId || magazineSrcs.length === 0) return;

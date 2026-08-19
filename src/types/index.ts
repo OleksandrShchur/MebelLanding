@@ -10,6 +10,8 @@ export interface Magazine {
   orientation: 'portrait' | 'landscape';
   page: PageDimensions;
   pages: MagazinePage[];
+  /** Stable list of page srcs, derived once when the manifest is parsed. */
+  srcs: string[];
 }
 
 export type Category =

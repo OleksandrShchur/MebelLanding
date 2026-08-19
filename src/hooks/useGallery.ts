@@ -1,29 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { AsyncStatus, Category, GalleryData, Magazine } from '../types';
-import { categories } from '../data/categories';
+import type { AsyncStatus, GalleryData } from '../types';
+import { normalizeGalleryData } from '../lib/gallery';
 
 interface GalleryState {
   data: GalleryData | null;
   status: AsyncStatus;
   error: string | null;
-}
-
-function isMagazineArray(value: unknown): value is Magazine[] {
-  return Array.isArray(value);
-}
-
-function normalizeGalleryData(payload: unknown): GalleryData {
-  if (!payload || typeof payload !== 'object') {
-    throw new Error('Некоректний формат каталогу.');
-  }
-
-  const manifest = payload as Partial<Record<Category, unknown>>;
-
-  return categories.reduce((accumulator, category) => {
-    const magazines = manifest[category.id];
-    accumulator[category.id] = isMagazineArray(magazines) ? magazines : [];
-    return accumulator;
-  }, {} as GalleryData);
 }
 
 export const useGallery = () => {

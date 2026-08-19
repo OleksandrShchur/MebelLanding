@@ -42,13 +42,15 @@ interface UseCatalogPageLoaderOptions {
 export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalogPageLoaderOptions) {
   const [loadedPages, setLoadedPages] = useState<ReadonlySet<number>>(() => new Set());
   const loadingRef = useRef(new Set<number>());
-  const pageCount = images.length;
-  const imageListKey = images.join('\0');
 
-  const imageUrls = useMemo(() => images.map((image) => catalogImageUrl(image)), [images]);
-  // Stable identity so loader revalidation / new array refs don't reset the viewer.
-  const imagesKey = useMemo(() => imageUrls.join('\0'), [imageUrls]);
+  const imagesKey = useMemo(() => images.join('\0'), [images]);
+  const imageUrls = useMemo(
+    () => (imagesKey === '' ? [] : imagesKey.split('\0').map((image) => catalogImageUrl(image))),
+    [imagesKey]
+  );
   const totalPages = imageUrls.length;
+  const imageUrlsRef = useRef(imageUrls);
+  imageUrlsRef.current = imageUrls;
 
   const shouldLoadPage = useCallback(
     (index: number) => {
@@ -79,21 +81,23 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
   useEffect(() => {
     if (!enabled || totalPages === 0) return;
 
+    const urls = imageUrlsRef.current;
     setLoadedPages(() => {
       const seeded = new Set<number>();
-      images.forEach((_, index) => {
-        if (isImageCached(imageUrls[index])) {
+      urls.forEach((url, index) => {
+        if (isImageCached(url)) {
           seeded.add(index);
         }
       });
       return seeded;
     });
     loadingRef.current.clear();
-  }, [enabled, imagesKey, imageUrls, totalPages]);
+  }, [enabled, imagesKey, totalPages]);
 
   useEffect(() => {
     if (!enabled || totalPages === 0) return;
 
+    const urls = imageUrlsRef.current;
     const { high, low } = getLoadIndices(currentPage, totalPages);
     let cancelled = false;
 
@@ -102,7 +106,7 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
         if (cancelled || loadingRef.current.has(index)) continue;
         loadingRef.current.add(index);
         try {
-          await preloadImage(imageUrls[index], 'high');
+          await preloadImage(urls[index], 'high');
         } catch {
           /* page component shows fallback */
         } finally {
@@ -114,7 +118,7 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
       for (const index of low) {
         if (cancelled || loadingRef.current.has(index)) continue;
         loadingRef.current.add(index);
-        void preloadImage(imageUrls[index], 'low')
+        void preloadImage(urls[index], 'low')
           .catch(() => undefined)
           .finally(() => {
             if (!cancelled) markPageLoaded(index);
@@ -128,7 +132,7 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
     return () => {
       cancelled = true;
     };
-  }, [currentPage, enabled, imageUrls, imagesKey, markPageLoaded, totalPages]);
+  }, [currentPage, enabled, imagesKey, markPageLoaded, totalPages]);
 
   const windowPagesReady = useMemo(() => {
     if (!enabled || totalPages === 0) return false;
@@ -150,6 +154,7 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
 
   return {
     imageUrls,
+    imagesKey,
     shouldLoadPage,
     isHighPriorityPage,
     markPageLoaded,
