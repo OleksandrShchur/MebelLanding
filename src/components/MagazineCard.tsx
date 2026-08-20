@@ -9,11 +9,11 @@ interface MagazineCardProps {
 }
 
 const MagazineCard = ({ magazine, onClick, disabled = false }: MagazineCardProps) => {
-  const coverImage = magazine.images[0];
+  const coverImage = magazine.srcs[0];
 
   const handlePrefetch = () => {
     if (!disabled) {
-      prefetchMagazinePages(magazine.images, 3);
+      prefetchMagazinePages(magazine.srcs, 2);
     }
   };
 

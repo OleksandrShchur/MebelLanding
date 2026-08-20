@@ -2,64 +2,100 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { catalogImageUrl } from '../utils/assets';
 import { isImageCached, preloadImage } from '../utils/imageCache';
 
-const HIGH_PRIORITY_RADIUS = 2;
-const LOW_PRIORITY_RADIUS = 6;
+const NEIGHBOR_RADIUS = 4;
 
-function getLoadIndices(currentPage: number, totalPages: number): { high: number[]; low: number[] } {
-  if (totalPages === 0) {
-    return { high: [], low: [] };
+export function getVisiblePageIndices(
+  currentPage: number,
+  totalPages: number,
+  singlePage: boolean
+): number[] {
+  if (totalPages === 0) return [];
+
+  const clamped = Math.max(0, Math.min(currentPage, totalPages - 1));
+
+  if (singlePage || totalPages === 1) {
+    return [clamped];
   }
 
-  const high = new Set<number>();
-  const low = new Set<number>();
+  const left = clamped % 2 === 0 ? clamped : clamped - 1;
+  const visible = [left];
+  if (left + 1 < totalPages) {
+    visible.push(left + 1);
+  }
+  return visible;
+}
 
-  for (let offset = -HIGH_PRIORITY_RADIUS; offset <= HIGH_PRIORITY_RADIUS; offset += 1) {
-    const index = currentPage + offset;
-    if (index >= 0 && index < totalPages) {
-      high.add(index);
+function getNeighborPageIndices(
+  visible: readonly number[],
+  totalPages: number,
+  radius = NEIGHBOR_RADIUS
+): number[] {
+  if (visible.length === 0 || totalPages === 0) return [];
+
+  const visibleSet = new Set(visible);
+  const from = Math.max(0, visible[0] - radius);
+  const to = Math.min(totalPages - 1, visible[visible.length - 1] + radius);
+  const neighbors: number[] = [];
+
+  for (let index = from; index <= to; index += 1) {
+    if (!visibleSet.has(index)) {
+      neighbors.push(index);
     }
   }
 
-  for (let offset = -LOW_PRIORITY_RADIUS; offset <= LOW_PRIORITY_RADIUS; offset += 1) {
-    const index = currentPage + offset;
-    if (index >= 0 && index < totalPages && !high.has(index)) {
-      low.add(index);
-    }
-  }
-
-  return {
-    high: [...high].sort((a, b) => a - b),
-    low: [...low].sort((a, b) => a - b),
-  };
+  return neighbors;
 }
 
 interface UseCatalogPageLoaderOptions {
   images: string[];
   currentPage: number;
   enabled: boolean;
+  singlePage: boolean;
 }
 
-export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalogPageLoaderOptions) {
+export function useCatalogPageLoader({
+  images,
+  currentPage,
+  enabled,
+  singlePage,
+}: UseCatalogPageLoaderOptions) {
   const [loadedPages, setLoadedPages] = useState<ReadonlySet<number>>(() => new Set());
-  const loadingRef = useRef(new Set<number>());
 
-  const imageUrls = useMemo(() => images.map((image) => catalogImageUrl(image)), [images]);
+  const imagesKey = useMemo(() => images.join('\0'), [images]);
+  const imageUrls = useMemo(
+    () => (imagesKey === '' ? [] : imagesKey.split('\0').map((image) => catalogImageUrl(image))),
+    [imagesKey]
+  );
+  const totalPages = imageUrls.length;
+  const imageUrlsRef = useRef(imageUrls);
+  imageUrlsRef.current = imageUrls;
+
+  const visibleIndices = useMemo(
+    () => getVisiblePageIndices(currentPage, totalPages, singlePage),
+    [currentPage, singlePage, totalPages]
+  );
+  const neighborIndices = useMemo(
+    () => getNeighborPageIndices(visibleIndices, totalPages),
+    [visibleIndices, totalPages]
+  );
+
+  const visibleReady = useMemo(() => {
+    if (!enabled || visibleIndices.length === 0) return false;
+    return visibleIndices.every((index) => loadedPages.has(index));
+  }, [enabled, loadedPages, visibleIndices]);
 
   const shouldLoadPage = useCallback(
     (index: number) => {
       if (!enabled) return false;
-      const { high, low } = getLoadIndices(currentPage, images.length);
-      return high.includes(index) || low.includes(index);
+      if (visibleIndices.includes(index)) return true;
+      return visibleReady && neighborIndices.includes(index);
     },
-    [currentPage, enabled, images.length]
+    [enabled, neighborIndices, visibleIndices, visibleReady]
   );
 
   const isHighPriorityPage = useCallback(
-    (index: number) => {
-      if (!enabled) return false;
-      return getLoadIndices(currentPage, images.length).high.includes(index);
-    },
-    [currentPage, enabled, images.length]
+    (index: number) => enabled && visibleIndices.includes(index),
+    [enabled, visibleIndices]
   );
 
   const markPageLoaded = useCallback((index: number) => {
@@ -72,52 +108,43 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
   }, []);
 
   useEffect(() => {
-    if (!enabled || images.length === 0) return;
+    if (!enabled || totalPages === 0) return;
 
+    const urls = imageUrlsRef.current;
     setLoadedPages(() => {
       const seeded = new Set<number>();
-      images.forEach((_, index) => {
-        if (isImageCached(imageUrls[index])) {
+      urls.forEach((url, index) => {
+        if (isImageCached(url)) {
           seeded.add(index);
         }
       });
       return seeded;
     });
-    loadingRef.current.clear();
-  }, [enabled, imageUrls, images]);
+  }, [enabled, imagesKey, totalPages]);
 
   useEffect(() => {
-    if (!enabled || images.length === 0) return;
+    if (!enabled || totalPages === 0) return;
 
-    const { high, low } = getLoadIndices(currentPage, images.length);
+    const urls = imageUrlsRef.current;
     let cancelled = false;
 
-    const queue = async () => {
-      for (const index of high) {
-        if (cancelled || loadingRef.current.has(index)) continue;
-        loadingRef.current.add(index);
-        try {
-          await preloadImage(imageUrls[index], 'high');
-          if (!cancelled) markPageLoaded(index);
-        } catch {
-          /* page component shows fallback */
-        } finally {
-          loadingRef.current.delete(index);
-        }
+    const loadPage = async (index: number, priority: 'high' | 'low') => {
+      try {
+        await preloadImage(urls[index], priority);
+      } catch {
+        /* page component shows fallback */
+      } finally {
+        if (!cancelled) markPageLoaded(index);
       }
+    };
 
-      for (const index of low) {
-        if (cancelled || loadingRef.current.has(index)) continue;
-        loadingRef.current.add(index);
-        void preloadImage(imageUrls[index], 'low')
-          .then(() => {
-            if (!cancelled) markPageLoaded(index);
-          })
-          .catch(() => undefined)
-          .finally(() => {
-            loadingRef.current.delete(index);
-          });
-      }
+    const queue = async () => {
+      await Promise.all(visibleIndices.map((index) => loadPage(index, 'high')));
+      if (cancelled) return;
+
+      neighborIndices.forEach((index) => {
+        void loadPage(index, 'low');
+      });
     };
 
     void queue();
@@ -125,28 +152,23 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
     return () => {
       cancelled = true;
     };
-  }, [currentPage, enabled, imageUrls, images.length, markPageLoaded]);
-
-  const windowPagesReady = useMemo(() => {
-    if (!enabled || images.length === 0) return false;
-    const { high } = getLoadIndices(currentPage, images.length);
-    return high.every((index) => loadedPages.has(index));
-  }, [currentPage, enabled, images.length, loadedPages]);
+  }, [enabled, imagesKey, markPageLoaded, neighborIndices, totalPages, visibleIndices]);
 
   const [viewerReady, setViewerReady] = useState(false);
 
   useEffect(() => {
     setViewerReady(false);
-  }, [images]);
+  }, [imagesKey]);
 
   useEffect(() => {
-    if (windowPagesReady) {
+    if (visibleReady) {
       setViewerReady(true);
     }
-  }, [windowPagesReady]);
+  }, [visibleReady]);
 
   return {
     imageUrls,
+    imagesKey,
     shouldLoadPage,
     isHighPriorityPage,
     markPageLoaded,
@@ -155,20 +177,20 @@ export function useCatalogPageLoader({ images, currentPage, enabled }: UseCatalo
   };
 }
 
-export function prefetchMagazinePages(images: string[], count = 3): void {
+export function prefetchMagazinePages(images: string[], count = 2): void {
   images.slice(0, count).forEach((image, index) => {
     void preloadImage(catalogImageUrl(image), index === 0 ? 'high' : 'low');
   });
 }
 
-export function prefetchMagazinePagesAround(images: string[], centerPage: number): void {
+export function prefetchMagazinePagesAround(
+  images: string[],
+  centerPage: number,
+  singlePage = true
+): void {
   if (images.length === 0) return;
 
-  const { high, low } = getLoadIndices(centerPage, images.length);
-  high.forEach((index) => {
+  getVisiblePageIndices(centerPage, images.length, singlePage).forEach((index) => {
     void preloadImage(catalogImageUrl(images[index]), 'high');
-  });
-  low.forEach((index) => {
-    void preloadImage(catalogImageUrl(images[index]), 'low');
   });
 }

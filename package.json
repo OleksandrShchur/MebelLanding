@@ -8,6 +8,7 @@
     "build": "vite build",
     "typecheck": "tsc -b",
     "deploy": "npm run build && gh-pages -d dist",
+    "encode:display": "node scripts/encode-display-webp.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

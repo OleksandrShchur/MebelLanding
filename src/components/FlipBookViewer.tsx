@@ -86,6 +86,7 @@ const Page = memo(
             style={{ aspectRatio: `${width} / ${height}` }}
             className="max-h-full max-w-full object-scale-down"
             onLoad={handleLoad}
+            onError={handleLoad}
           />
         ) : (
           <div
@@ -118,11 +119,12 @@ const FlipBookViewer = ({
   const resolvedHeight = displayHeight ?? DEFAULT_DISPLAY_HEIGHT;
   const { width: pageWidth, height: pageHeight } = getPageSlotDimensions(pageDimensions, resolvedHeight);
 
-  const { imageUrls, shouldLoadPage, isHighPriorityPage, markPageLoaded, viewerReady } =
+  const { imageUrls, imagesKey, shouldLoadPage, isHighPriorityPage, markPageLoaded, viewerReady } =
     useCatalogPageLoader({
       images,
       currentPage,
       enabled: true,
+      singlePage,
     });
 
   const bookReadyReportedRef = useRef(false);
@@ -137,7 +139,7 @@ const FlipBookViewer = ({
 
   useEffect(() => {
     bookReadyReportedRef.current = false;
-  }, [images, pageWidth, pageHeight, singlePage, isMobile]);
+  }, [imagesKey, pageWidth, pageHeight, singlePage, isMobile]);
 
   const handleFlip = useCallback(
     (e: { data: unknown }) => {
