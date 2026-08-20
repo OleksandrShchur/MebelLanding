@@ -154,10 +154,12 @@ const MagazineModal = ({ magazine, categoryName, isOpen, onClose }: MagazineModa
     flipRef.current = null;
     const pageIndex = parsePageIndex(searchParams.get('page'));
     setCurrentPage(pageIndex);
-    prefetchMagazinePagesAround(magazineSrcs, pageIndex);
+    const prefetchSinglePage =
+      isMobile || magazineSrcs.length <= 1 || magazine?.page.spread === 'single';
+    prefetchMagazinePagesAround(magazineSrcs, pageIndex, prefetchSinglePage);
     // Only reset when the open magazine changes — not on search-param / referential updates.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed by magazineId
-  }, [isOpen, magazineId]);
+  }, [isOpen, magazineId, isMobile]);
 
   useEffect(() => {
     if (!isOpen) return;

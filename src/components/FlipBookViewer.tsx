@@ -124,6 +124,7 @@ const FlipBookViewer = ({
       images,
       currentPage,
       enabled: true,
+      singlePage,
     });
 
   const bookReadyReportedRef = useRef(false);

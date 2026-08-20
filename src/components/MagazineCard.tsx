@@ -13,7 +13,7 @@ const MagazineCard = ({ magazine, onClick, disabled = false }: MagazineCardProps
 
   const handlePrefetch = () => {
     if (!disabled) {
-      prefetchMagazinePages(magazine.srcs, 3);
+      prefetchMagazinePages(magazine.srcs, 2);
     }
   };
 

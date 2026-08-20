@@ -5,7 +5,7 @@ type CacheEntry = {
 
 const cache = new Map<string, CacheEntry>();
 
-function createEntry(src: string): CacheEntry {
+function createEntry(src: string, priority: 'high' | 'low'): CacheEntry {
   const entry: CacheEntry = {
     promise: Promise.resolve(),
     status: 'pending',
@@ -14,6 +14,7 @@ function createEntry(src: string): CacheEntry {
   entry.promise = new Promise<void>((resolve, reject) => {
     const img = new Image();
     img.decoding = 'async';
+    img.fetchPriority = priority;
 
     const finish = () => {
       entry.status = 'loaded';
@@ -45,24 +46,8 @@ export function preloadImage(src: string, priority: 'high' | 'low' = 'low'): Pro
     return Promise.resolve();
   }
 
-  const entry = existing ?? createEntry(src);
+  const entry = existing ?? createEntry(src, priority);
   cache.set(src, entry);
-
-  if (priority === 'high' && typeof HTMLLinkElement !== 'undefined') {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = src;
-    document.head.appendChild(link);
-    link.addEventListener(
-      'load',
-      () => {
-        link.remove();
-      },
-      { once: true }
-    );
-  }
-
   return entry.promise;
 }
 
